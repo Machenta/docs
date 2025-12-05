@@ -1,0 +1,143 @@
+---
+title: 'Status'
+description: 'Poll job progress'
+---
+
+# Status - Poll Job Progress
+
+Returns the latest status of one or more queued jobs. Call this endpoint repeatedly until the status reaches `success`, `failed`, or `cancelled`.
+
+## Endpoint
+
+| Attribute | Value |
+| --- | --- |
+| **URL** | `/api/tools/k12-annex-editing-status/execute` |
+| **Method** | `POST` |
+| **Auth** | [Required](/api-reference/eop/auth) |
+
+## Request
+
+<CodeGroup>
+```bash cURL
+curl -X POST "$BASE_URL/api/tools/k12-annex-editing-status/execute" \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Ocp-Apim-Subscription-Key: $SUBSCRIPTION_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "data": {
+      "requestIds": ["9fd2055d-42ab-4c29-bf0d-51bd8f7db3ec"]
+    }
+  }'
+```
+
+```javascript JavaScript
+const response = await fetch(`${BASE_URL}/api/tools/k12-annex-editing-status/execute`, {
+  method: 'POST',
+  headers: {
+    'Authorization': `Bearer ${token}`,
+    'Ocp-Apim-Subscription-Key': subscriptionKey,
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    data: {
+      requestIds: ['9fd2055d-42ab-4c29-bf0d-51bd8f7db3ec']
+    }
+  })
+});
+
+const statuses = await response.json();
+```
+
+```python Python
+import requests
+
+response = requests.post(
+    f"{BASE_URL}/api/tools/k12-annex-editing-status/execute",
+    headers={
+        "Authorization": f"Bearer {token}",
+        "Ocp-Apim-Subscription-Key": subscription_key,
+        "Content-Type": "application/json"
+    },
+    json={
+        "data": {
+            "requestIds": ["9fd2055d-42ab-4c29-bf0d-51bd8f7db3ec"]
+        }
+    }
+)
+
+statuses = response.json()
+```
+</CodeGroup>
+
+## Request Body Fields
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `requestIds` | string[] | ✅ | One or more kickoff `requestId` values to poll |
+
+<Note>
+You can poll multiple jobs in a single request by providing multiple request IDs in the array.
+</Note>
+
+## Response
+
+```json
+[
+  {
+    "requestId": "9fd2055d-42ab-4c29-bf0d-51bd8f7db3ec",
+    "sessionId": "0e1a5e3f-3a3c-4d1f-bbc6-0e76b1c4a8c7",
+    "status": "processing"
+  }
+]
+```
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `requestId` | UUID | The job identifier you polled |
+| `sessionId` | UUID | Session correlation id (matches kickoff) |
+| `status` | string | Current job status |
+| `message` | string | Present when `status` is `failed`/`error`; contains the error text |
+
+## Status Values
+
+| Status | Description | Next Action |
+| --- | --- | --- |
+| `accepted` | Job queued, not yet started | Keep polling |
+| `processing` | Workflow is running | Keep polling |
+| `success` | Edit complete | Fetch [Result](/api-reference/eop/result) |
+| `failed` | Workflow failed | Check `message` for error details |
+| `error` | System error occurred | Check `message` for error details |
+| `cancelled` | Job was cancelled | No further action needed |
+
+## Polling Example
+
+```javascript
+async function waitForCompletion(requestId, headers) {
+  const terminalStatuses = ['success', 'failed', 'error', 'cancelled'];
+  
+  while (true) {
+    const response = await fetch(`${BASE_URL}/api/tools/k12-annex-editing-status/execute`, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({ data: { requestIds: [requestId] } })
+    });
+    
+    const [statusData] = await response.json();
+    console.log(`Status: ${statusData.status}`);
+    
+    if (terminalStatuses.includes(statusData.status)) {
+      if (statusData.status === 'failed' || statusData.status === 'error') {
+        throw new Error(statusData.message || 'Job failed');
+      }
+      return statusData.status;
+    }
+    
+    // Wait 2 seconds before polling again
+    await new Promise(resolve => setTimeout(resolve, 2000));
+  }
+}
+```
+
+## Next Step
+
+Once status is `success`, call the [Result](/api-reference/eop/result) endpoint to retrieve the edited content.

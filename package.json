@@ -4,7 +4,10 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "docs:dev": "mint dev"
+    "docs:dev": "mint dev",
+    "docs:build:public": "node ./scripts/build-filtered-docs.mjs public",
+    "preview:public": "cd build/public && npx mint dev",
+    "preview:public:static": "cd build/public && npx http-server -p 8080"
   },
   "dependencies": {
     "gray-matter": "^4.0.3"

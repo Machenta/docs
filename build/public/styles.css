@@ -1,0 +1,82 @@
+/* Global site color variables and minor overrides for the K12 Safety docs */
+:root {
+  --color-primary: #0F61D4; /* primary buttons / links */
+  --color-primary-strong: #0C4EAF; /* darker hover */
+  --color-primary-soft: #E8F1FF; /* light variant background */
+  --color-success: #32C48D;
+  --color-warning: #F0B429;
+  --color-danger: #E04E3D;
+  --color-text-strong: #0F172A;
+  --color-text: #1F2937;
+  --color-text-muted: #6B7280;
+  --color-border: #E5E7EB;
+  --color-surface: #FFFFFF;
+  --color-surface-muted: #F8FAFC;
+}
+
+/* Page background & global text colors */
+body {
+  background-color: var(--color-surface-muted);
+  color: var(--color-text);
+}
+
+/* Links */
+a { color: var(--color-primary); }
+a:hover, a:focus { color: var(--color-primary-strong); }
+
+/* Buttons: Mintlify uses a few names; fallback to common patterns */
+.button, button, input[type=submit], .btn {
+  background-color: var(--color-primary);
+  color: white;
+  border: 1px solid var(--color-primary-strong);
+  box-shadow: none;
+}
+.button:hover, button:hover, .btn:hover {
+  background-color: var(--color-primary-strong);
+}
+
+/* Cards */
+.card, .mint_card, .card > * {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+}
+
+/* Sidebar and header accents */
+.docs__sidebar, .sidebar, .nav, .nav__container {
+  --bg: var(--color-surface);
+  background: var(--color-surface);
+}
+
+/* Accent small UI surface */
+.badge, .chip, .kpi, .tag {
+  background: var(--color-primary-soft);
+  color: var(--color-primary-strong);
+}
+
+/* Muted text and borders */
+.muted, .text-muted { color: var(--color-text-muted); }
+hr { border-color: var(--color-border); }
+
+/* Make code blocks a little more subtle to match the brand */
+pre, code { background: #F3F6FB; }
+
+/* Progress and success states */
+.progress-bar { background: linear-gradient(90deg, var(--color-success), var(--color-primary)); }
+
+/* A quick helper for hero/banner backgrounds */
+.hero {
+  background: linear-gradient(180deg, var(--color-surface) 0%, var(--color-surface-muted) 100%);
+}
+
+/* Accessible focus outlines */
+:focus { outline: 3px solid var(--color-primary-soft); outline-offset: 2px; }
+
+/* Make sure headings are strong and legible */
+h1, h2, h3, h4, h5 { color: var(--color-text-strong); }
+
+/* Small responsive tweak for nav to show color on active */
+.nav a.active, .nav a:active { color: var(--color-primary); font-weight: 600; }
+
+/* If Mintlify components have more specific classes, augment them here later. */
+
+/* END of brand overrides */

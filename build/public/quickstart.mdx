@@ -1,0 +1,111 @@
+---
+title: "Quickstart"
+description: "Start building awesome documentation in minutes"
+---
+
+<link rel="stylesheet" href="/styles.css" />
+
+## Quickstart: Previewing & Local Development
+
+This doc covers how to preview the documentation site. It also shows how to run the Mastra runtime for local development if you want to test flows end-to-end.
+The material below is a short version of the project README. For full details and advanced configuration, see the repository README at the project root.
+
+### Step 1: Set up your local environment (Docs & Runtime)
+
+<AccordionGroup>
+  <Accordion icon="copy" title="Clone your docs locally">
+    During the onboarding process, you created a GitHub repository with your docs content if you didn't already have one. You can find a link to this repository in your [dashboard](https://dashboard.mintlify.com).
+    
+    To clone the repository locally so that you can make and preview changes to your docs, follow the [Cloning a repository](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository) guide in the GitHub docs.
+  </Accordion>
+
+  <Accordion icon="rectangle-terminal" title="View docs locally (optional)">
+    To preview the documentation locally, follow the repository README instructions. This project does not require a specific documentation CLI; use the workflow or tooling that works best for your environment. If you use Mintlify for doc previews in development, refer to Mintlify's docs — but installing and running the Mintlify CLI is optional and not required for Mastra development.
+  </Accordion>
+
+  <Accordion icon="rectangle-terminal" title="Start the Mastra runtime (optional)">
+    1. From the project root (Mastra repo) install dependencies:
+    ```bash
+    npm install
+    ```
+    2. Copy environment example to a working `.env` and update values:
+    ```powershell
+    copy .env.example .env
+    ```
+    3. Verify `.env` keys are present:
+    ```bash
+    npm run check:env
+    ```
+    4. Start the runtime (recommended):
+    ```powershell
+    pwsh ./scripts/start-dev.ps1   # Windows PowerShell recommended
+    # OR
+    npm run quickstart
+    # OR (simple dev script)
+    npm run dev
+    ```
+
+    5. The Mastra runtime exposes runtime endpoints and the registries view at `http://localhost:4111` when running locally. Use `GET /registries` or the small UI at `/registries` to inspect loaded agents, tools, and workflows.
+  </Accordion>
+
+  <Accordion icon="rectangle-terminal" title="Local preview">
+    You can preview the docs locally or use the hosted environment when available. If you need runtime endpoints or registries, start the runtime as above.
+  </Accordion>
+</AccordionGroup>
+
+### Step 2: Deploy your changes
+
+<AccordionGroup>
+  <Accordion icon="github" title="Install our GitHub app">
+    Install the Mintlify GitHub app from your [dashboard](https://dashboard.mintlify.com/settings/organization/github-app).
+    
+    Our GitHub app automatically deploys your changes to your docs site, so you don't need to manage deployments yourself.
+</Accordion>
+<Accordion icon="palette" title="Update your site name and colors">
+    For a first change, let's update the name and colors of your docs site.
+
+    1. Open `docs.json` in your editor.
+    2. Change the `"name"` field to your project name.
+    3. Update the `"colors"` to match your brand.
+    4. Save and see your changes instantly at `http://localhost:3000`.
+
+    <Tip>Try changing the primary color to see an immediate difference!</Tip>
+  </Accordion>
+</AccordionGroup>
+
+### Step 3: Go live
+
+<Accordion icon="rocket" title="Publish your docs">
+  1. Commit and push your changes.
+  2. Your docs will update and be live in moments!
+</Accordion>
+
+## Next steps
+
+Now that you have your docs running, explore these key features:
+
+<CardGroup cols={2}>
+
+<Card title="Write Content" icon="pen-to-square" href="/essentials/settings">
+  Learn the essentials of authoring, settings, and navigation.
+</Card>
+
+<Card title="Customize style" icon="palette" href="/essentials/settings">
+  Make your docs match your brand perfectly.
+</Card>
+
+<Card title="Add code examples" icon="square-code" href="/api-reference/introduction">
+  Include syntax-highlighted code blocks and API request examples.
+</Card>
+
+<Card title="API documentation" icon="code" href="/api-reference/introduction">
+  Auto-generate API docs from OpenAPI specs.
+</Card>
+
+</CardGroup>
+
+<Note>
+  **Need help?** See the project README at the repo root for full developer instructions or open an issue if you need more context. Also, see Mintlify docs if you need help with the documentation platform.
+
+  **Audience-specific builds**: Removed. The docs now ship as a single unified set; use the standard repo workflows for previews and deployments.
+</Note>

@@ -1,0 +1,135 @@
+---
+title: 'Development'
+description: 'Preview changes locally to update your docs'
+---
+
+<link rel="stylesheet" href="/styles.css" />
+
+<Info>
+  **Prerequisites**:
+  - Node.js version 19 or higher
+  - A docs repository with a `docs.json` file
+   - Node.js 18+ (the Mastra runtime prefers Node 18 or higher; some tooling requires 19+)
+   - Git and a working clone of the repository
+   - PowerShell (for running the `start-dev.ps1` bootstrap script on Windows)
+</Info>
+
+Follow these steps to set up and preview the Mastra project and documentation locally.
+
+<Steps>
+<Step title="Install dependencies">
+
+```bash
+npm install
+```
+
+This installs the runtime and development tools used by the Mastra project.
+
+</Step>
+
+<Step title="Preview the Mastra runtime locally">
+
+Use the project's helper scripts to start the runtime and optional services. These scripts warm the registry and expose admin endpoints.
+
+```powershell
+pwsh ./scripts/start-dev.ps1  # Windows PowerShell recommended
+# OR
+npm run quickstart
+# OR
+npm run dev
+```
+
+When running the runtime locally the registries UI is available at `http://localhost:4111/registries`.
+
+</Step>
+</Steps>
+
+## Authentication and base URLs for K12 annex tools
+
+Use these settings when calling the K12 annex tools from local scripts or Postman.
+
+**OAuth (APIM path)**
+
+- OAuth tenant: `https://login.microsoftonline.com/{TENANT_ID}/oauth2/v2.0/token`
+- Scope: `api://k12-api-dev/.default`
+- Grant type: `client_credentials`
+- Required headers: `Authorization: Bearer {access_token}`, `Ocp-Apim-Subscription-Key: {subscription_key}`, `Content-Type: application/json`
+
+**Environment variables**
+
+| Variable | Description |
+| --- | --- |
+| `CLIENT_ID` | Azure AD app id that has access to the K12 annex API scope |
+| `CLIENT_SECRET` | Client secret for the Azure AD app |
+| `TENANT_ID` | Directory/tenant containing the app registration |
+| `ANNEX_SUBSCRIPTION_KEY` | APIM subscription key; optional for pure OAuth but required for the K12 Azure Dev APIM |
+| `ANNEX_BASE_URL` | Overrides the base URL (e.g., point scripts at the APIM host) |
+
+**Base URLs**
+
+| Environment | Base URL |
+| --- | --- |
+| K12 Azure Dev (APIM) | `https://aitools-dev-apim-k12.azure-api.net` |
+| Local development | `http://localhost:3001/development` |
+
+**Local dev JWT flow (no APIM)**
+
+1) Open `http://localhost:3001/development` in a browser.
+2) Authenticate with your test credentials.
+3) Copy the returned JWT from the response body or network tab.
+4) Use `Authorization: Bearer <token>` for local tool calls; `Ocp-Apim-Subscription-Key` is not needed for local.
+
+## Running the Mastra runtime locally
+
+Use the Mastra `start-dev` script to bootstrap `.env` and warm the registry during local development. This script is helpful for preparing runtime dependencies and starting the server in a reproducible way.
+
+**Basic runtime steps:**
+
+1. From the repository root, install dependencies:
+```bash
+npm install
+```
+2. Copy `.env.example` and update values in `.env` for your environment (APIM, Azure OpenAI, SQL, etc.):
+```powershell
+copy .env.example .env
+```
+3. Start the runtime with the provided PowerShell helper (recommended on Windows):
+```powershell
+pwsh ./scripts/start-dev.ps1
+```
+4. Confirm the runtime is running and inspect the registries endpoint: `http://localhost:4111/registries`.
+
+**Useful runtime commands:**
+- `npm run dev` — start the Mastra runtime using the dev script
+- `npm run quickstart` — convenience script that may call the PowerShell start helper
+- `npm run test:unit` — run unit tests
+- `npm test` — run integration tests against a local `BASE_URL` (default `http://localhost:4111`)
+
+For a comprehensive walkthrough and troubleshooting guides, see the repository README.
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title='Error: Could not load the "sharp" module using the darwin-arm64 runtime'>
+
+    This may be due to an outdated version of node or missing native build artifacts. Try the following:
+    1. Upgrade Node.js to a supported version (Node 18+ recommended).
+    2. Re-install local dependencies from the repo root:
+    ```bash
+    npm ci
+    ```
+    3. If native modules fail to build, try removing local `node_modules` and repeating the install.
+  </Accordion>
+
+  <Accordion title="Issue: Encountering an unknown error">
+  
+    Solution: Try clearing local caches, reinstalling dependencies, and restarting the development scripts:
+    ```bash
+    rm -rf ~/.npm ~/.cache
+    npm ci
+    npm run dev
+    ```
+  </Accordion>
+</AccordionGroup>
+
+Curious about what changed in the latest CLI version? Check out the [CLI changelog](https://www.npmjs.com/package/mintlify?activeTab=versions).

@@ -1,0 +1,142 @@
+---
+title: 'Kickoff'
+description: 'Start an annex editing job'
+---
+
+# Kickoff - Start an Annex Edit Job
+
+Enqueues an annex editing job, persists the payload, and launches the workflow while immediately returning tracking identifiers.
+
+## Endpoint
+
+| Attribute | Value |
+| --- | --- |
+| **URL** | `/api/tools/k12-annex-editing-kickoff/execute` |
+| **Method** | `POST` |
+| **Auth** | [Required](/api-reference/eop/auth) |
+
+## Request
+
+<CodeGroup>
+```bash cURL
+curl -X POST "$BASE_URL/api/tools/k12-annex-editing-kickoff/execute" \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Ocp-Apim-Subscription-Key: $SUBSCRIPTION_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "data": {
+      "emergencyOperationPlanId": "plan-sample",
+      "userId": "principal@example.edu",
+      "roleId": "safety-coordinator",
+      "form": {
+        "name": "Annex A",
+        "field": {
+          "group": "Response Procedures",
+          "name": "Initial Actions",
+          "content": "<p>Current annex content to edit...</p>"
+        }
+      },
+      "prompt": "Shorten to two bullet points"
+    }
+  }'
+```
+
+```javascript JavaScript
+const response = await fetch(`${BASE_URL}/api/tools/k12-annex-editing-kickoff/execute`, {
+  method: 'POST',
+  headers: {
+    'Authorization': `Bearer ${token}`,
+    'Ocp-Apim-Subscription-Key': subscriptionKey,
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    data: {
+      emergencyOperationPlanId: 'plan-sample',
+      userId: 'principal@example.edu',
+      roleId: 'safety-coordinator',
+      form: {
+        name: 'Annex A',
+        field: {
+          group: 'Response Procedures',
+          name: 'Initial Actions',
+          content: '<p>Current annex content to edit...</p>'
+        }
+      },
+      prompt: 'Shorten to two bullet points'
+    }
+  })
+});
+
+const result = await response.json();
+console.log(result.requestId); // Use this to poll status
+```
+
+```python Python
+import requests
+
+response = requests.post(
+    f"{BASE_URL}/api/tools/k12-annex-editing-kickoff/execute",
+    headers={
+        "Authorization": f"Bearer {token}",
+        "Ocp-Apim-Subscription-Key": subscription_key,
+        "Content-Type": "application/json"
+    },
+    json={
+        "data": {
+            "emergencyOperationPlanId": "plan-sample",
+            "userId": "principal@example.edu",
+            "roleId": "safety-coordinator",
+            "form": {
+                "name": "Annex A",
+                "field": {
+                    "group": "Response Procedures",
+                    "name": "Initial Actions",
+                    "content": "<p>Current annex content to edit...</p>"
+                }
+            },
+            "prompt": "Shorten to two bullet points"
+        }
+    }
+)
+
+result = response.json()
+request_id = result["requestId"]
+```
+</CodeGroup>
+
+## Request Body Fields
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `emergencyOperationPlanId` | string | ✅ | Plan identifier to update |
+| `emergencyOperationPlanConfigurationId` | string | ❌ | Optional configuration/profile variant |
+| `userId` | string | ✅ | Requesting user (GUID or email) |
+| `roleId` | string | ✅ | Role/persona performing the edit |
+| `form.name` | string | ❌ | Friendly name for the annex form |
+| `form.field.group` | string | ❌ | Section/group label shown to authors |
+| `form.field.name` | string | ❌ | Field title containing the editable text |
+| `form.field.content` | string | ✅ | HTML/rich-text content (empty string `""` for prompt-only edits) |
+| `prompt` | string | ❌ | Additional user instruction (e.g., "shorten to two bullets") |
+| `sessionId` | UUID | ❌ | Reuse an existing async session |
+| `requestId` | UUID | ❌ | Deterministically track the job id |
+| `waitForResult` | boolean | ❌ | Block until completion (default: `false` for async) |
+
+## Response
+
+```json
+{
+  "requestId": "9fd2055d-42ab-4c29-bf0d-51bd8f7db3ec",
+  "sessionId": "0e1a5e3f-3a3c-4d1f-bbc6-0e76b1c4a8c7",
+  "status": "accepted"
+}
+```
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `requestId` | UUID | Identifier for the enqueued job - use this for status/result calls |
+| `sessionId` | UUID | Session correlation id |
+| `status` | string | Always `accepted` on success |
+
+## Next Step
+
+After receiving the `requestId`, poll the [Status](/api-reference/eop/status) endpoint until the job completes.

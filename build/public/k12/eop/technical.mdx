@@ -1,0 +1,62 @@
+---
+title: "EOP Solution Overview"
+description: "External-facing guide to the K12 EOP annex editing solution"
+audience: ["pm","dev"]
+---
+
+<link rel="stylesheet" href="/styles.css" />
+
+# EOP Solution Overview
+
+A high-level, customer-facing description of how the K12 EOP annex editing solution works, what it exposes, and how to integrate with it.
+
+## What the solution does
+
+- Lets client apps submit EOP annex content for AI-assisted edits or clarifications.
+- Runs an async workflow that logs requests, calls the K12 agent, and stores results.
+- Exposes simple tool endpoints for kickoff, status polling, result retrieval, and cancellation.
+- Provides auditability via job/status tables and deterministic IDs for correlation.
+
+## Core flow
+
+1) **Kickoff**: Client posts plan + form content (and optional prompt). The service creates deterministic IDs, logs the job, and starts the workflow.
+2) **Status**: Client polls lightweight status rows to track `accepted → processing → success|failed|error|cancelled`.
+3) **Result**: Client fetches the final edited message and flags when the workflow succeeds.
+4) **Cancel**: Client can mark a job cancelled; when enabled, the system also attempts workflow cancellation.
+
+## Surface area
+
+All EOP annex operations are exposed as tools under `/api/tools/{toolId}/execute`:
+- `k12-annex-editing-kickoff` — start an edit job (async or sync via `waitForResult=true`).
+- `k12-annex-editing-status` — poll job status by `requestId`.
+- `k12-annex-editing-result` — retrieve the edited content.
+- `k12-cancel-task-request` — request cancellation for a job.
+
+## Auth models
+
+- **APIM / cloud**: OAuth2 client credentials + APIM subscription key.
+- **Local dev**: Optional JWT from the dev helper page; APIM key not required.
+- See `/k12/external-reference` for exact headers, token flow, and environment variables.
+
+## Identifiers and correlation
+
+- Provide `requestId` + `sessionId` to correlate kickoff, status, result, and DB rows.
+- If omitted, the workflow generates deterministic GUIDs from the payload (idempotent for identical inputs).
+
+## Latency and usage guidance
+
+- Prefer async usage (`waitForResult=false`) and poll status to avoid client timeouts.
+- Use modest polling intervals (e.g., 2s) to keep load low while maintaining responsiveness.
+- Use cancel when users abandon or restart an edit to keep queues clean.
+
+## Data and observability
+
+- Request, response, and status are persisted for auditing and troubleshooting (see Data Plane page).
+- `workflowRunId` is available for deeper tracing and cancellation in advanced scenarios.
+
+## Related docs
+
+- External API details: `/k12/external-reference`
+- Internal developer reference: `/k12/internal-reference`
+- Data plane (tables/fields): `/k12/eop/data-plane`
+- EOP overview: `/k12/eop/overview`

@@ -1,0 +1,162 @@
+---
+title: "EOP External Reference"
+description: "Endpoints and payloads exposed to K12 Safety (EOP annex editing) clients"
+audience: ["dev","pm"]
+---
+
+<link rel="stylesheet" href="/styles.css" />
+
+## What this covers
+
+A concise guide to the externally exposed K12 Safety tools/endpoints that clients call over HTTP. Use this when integrating UIs or services that trigger annex edits, poll status, fetch results, or cancel work.
+
+## Base calling pattern
+
+All tools are reachable at `/api/tools/{toolId}/execute` and accept JSON `{ "data": { ... } }` bodies. Auth and headers depend on your environment (APIM vs internal). Common headers:
+
+- `Authorization: Bearer <token>` (AAD client credentials when provided)
+- `Ocp-Apim-Subscription-Key: <key>` (when APIM is fronting the service)
+- `Content-Type: application/json`
+
+## OpenAPI specification
+
+The full interactive API reference is available in the **API reference** tab. It auto-generates from `/api-reference/openapi.json`.
+
+## Authentication (APIM path)
+
+- OAuth tenant: `https://login.microsoftonline.com/{TENANT_ID}/oauth2/v2.0/token`
+- Scope: `api://k12-api-dev/.default`
+- Grant type: `client_credentials`
+- Required headers: `Authorization: Bearer {access_token}`, `Ocp-Apim-Subscription-Key: {subscription_key}`, `Content-Type: application/json`
+
+**Environment variables**
+
+| Variable | Description |
+| --- | --- |
+| `CLIENT_ID` | Azure AD app id that has access to the K12 annex API scope |
+| `CLIENT_SECRET` | Client secret for the Azure AD app |
+| `TENANT_ID` | Directory/tenant containing the app registration |
+| `ANNEX_SUBSCRIPTION_KEY` | APIM subscription key; optional for pure OAuth but required for the K12 Azure Dev APIM |
+| `ANNEX_BASE_URL` | Overrides the base URL (e.g., point scripts at the APIM host) |
+
+**Base URLs**
+
+| Environment | Base URL |
+| --- | --- |
+| K12 Azure Dev (APIM) | `https://aitools-dev-apim-k12.azure-api.net` |
+| Local development | `http://localhost:3001/development` |
+
+**Local dev JWT flow (no APIM)**
+
+1) Open `http://localhost:3001/development` in a browser.
+2) Authenticate with your test credentials.
+3) Copy the returned JWT from the response body or network tab.
+4) Use `Authorization: Bearer <token>` for local tool calls; `Ocp-Apim-Subscription-Key` is not needed for local.
+
+## Tool summary
+
+<CardGroup cols={2}>
+<Card title="Kickoff" icon="rocket" href="#k12-annex-editing-kickoff">
+Start an annex edit job with plan + form content, optional prompt, and optional sync wait.
+</Card>
+<Card title="Status" icon="clock" href="#k12-annex-editing-status">
+Poll job status from `log_Jobs` by request IDs.
+</Card>
+<Card title="Result" icon="check" href="#k12-annex-editing-result">
+Fetch the final stored response (message + isEdit) for a request.
+</Card>
+<Card title="Cancel" icon="ban" href="#k12-cancel-task-request">
+Mark a request cancelled and attempt to stop in-flight runs.
+</Card>
+</CardGroup>
+
+## Endpoints
+
+<a id="k12-annex-editing-kickoff"></a>
+### k12-annex-editing-kickoff
+Kick off an annex edit workflow; optionally wait for completion.
+
+<Steps>
+<Step title="Request body">
+- `emergencyOperationPlanId` (string, required)
+- `emergencyOperationPlanConfigurationId` (string, optional)
+- `userId`, `roleId` (strings, required)
+- `form.name` (string, optional)
+- `form.field.group` (string, optional)
+- `form.field.name` (string, optional)
+- `form.field.content` (string, optional; may be empty for prompt-only)
+- `prompt` (string, optional)
+- `requestId`, `sessionId` (UUID strings, optional; generated if omitted)
+- `waitForResult` (boolean, default false)
+</Step>
+<Step title="Response (async)">
+`status: "accepted"`, plus `requestId`, `sessionId`, optional `workflowRunId`, and a message.
+</Step>
+<Step title="Response (sync)">
+If `waitForResult=true`, returns `status: "success"`, `message`, `isEdit`, `responseStatus`, `agentResponse`, `responsePayloadJson`, `statusHistory`, `requestLogId`, `monitoringRowId`.
+</Step>
+</Steps>
+
+<RequestExample>
+```bash
+curl -X POST "$BASE/api/tools/k12-annex-editing-kickoff/execute" \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Ocp-Apim-Subscription-Key: $SUB_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"data":{"emergencyOperationPlanId":"plan-123","userId":"principal@example.edu","roleId":"safety-coordinator","form":{"field":{"content":"<p>Draft annex text</p>"}},"prompt":"Rewrite in two bullets"}}'
+```
+</RequestExample>
+
+<a id="k12-annex-editing-status"></a>
+### k12-annex-editing-status
+Poll status rows stored in `log_Jobs` for one or more request IDs.
+
+- **Input**: `requestIds` (array of strings)
+- **Output**: array of `{ requestId, sessionId, status }`
+
+<RequestExample>
+```bash
+curl -X POST "$BASE/api/tools/k12-annex-editing-status/execute" \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Ocp-Apim-Subscription-Key: $SUB_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"data":{"requestIds":["9fd2055d-42ab-4c29-bf0d-51bd8f7db3ec"]}}'
+```
+</RequestExample>
+
+<ResponseExample>
+```json
+[{"requestId":"9fd2055d-42ab-4c29-bf0d-51bd8f7db3ec","sessionId":"0e1a5e3f-3a3c-4d1f-bbc6-0e76b1c4a8c7","status":"processing"}]
+```
+</ResponseExample>
+
+<a id="k12-annex-editing-result"></a>
+### k12-annex-editing-result
+Fetch the stored result for a request from `log_Jobs`.
+
+- **Input**: `requestId` (string)
+- **Output**: `{ requestId, sessionId, status, message, isEdit }`
+
+<a id="k12-cancel-task-request"></a>
+### k12-cancel-task-request
+Cancel a request and attempt to stop in-flight workflow runs (when cancellation is enabled).
+
+- **Input**: `requestId` (string)
+- **Output**: `{ status: "success" | "error", message? }`
+
+<Warning>
+Cancellation requires `K12_ENABLE_WORKFLOW_CANCELLATION=true`. When disabled, rows are still marked `cancelled`.
+</Warning>
+
+## Status values
+
+`accepted`, `processing`, `success`, `failed`, `error`, `cancelled`
+
+## Tips for integrators
+
+- Provide both `requestId` and `sessionId` when you need strict correlation in logs and UI state.
+- Use `waitForResult=true` only when the client can block; otherwise call status/result after kickoff.
+- Treat `message` as user-visible text; `responsePayloadJson` holds the structured edit payload.
+- Snapshot metadata is available via `k12-get-emergency-operation-plan-snapshot` if your UI needs plan versions.
+
+For tool-technical notes (identifiers, async vs sync, cancellation behavior, and snapshot paging), see the internal developer reference: `/k12/internal-reference`.
