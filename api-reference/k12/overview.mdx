@@ -1,10 +1,11 @@
 ---
 title: "K12 Tools & API Overview"
 description: "Conceptual map of the K12 Mastra surface for developers"
-audience: ["dev"]
 ---
 
 <link rel="stylesheet" href="/styles.css" />
+
+<OpenAPI src="/api-reference/openapi.json" />
 
 ## Runtime surface
 
@@ -31,6 +32,110 @@ All tools are available via the Mastra tool registry and exposed over `/api/tool
   - `k12-lkp-task-request-result`: Returns the latest stored response (`status`, `message`, `isEdit`) from `log_EOP_TaskRequests`.
 - **Plan metadata**
   - `k12-get-emergency-operation-plan-snapshot`: Calls the K12 Safety REST API for snapshot metadata; supports paging and latest-only.
+
+<AccordionGroup>
+<Accordion title="k12-annex-editing-kickoff">
+Kick off the annex workflow, seed `log_Jobs`, and optionally wait for completion.
+
+**Input**
+- `emergencyOperationPlanId` (string, required)
+- `emergencyOperationPlanConfigurationId` (string, optional)
+- `userId`, `roleId` (strings, required)
+- `form.name` (string, optional), `form.field.group|name|content` (strings, optional; content can be empty to indicate prompt-only)
+- `prompt` (string, optional)
+- `requestId`, `sessionId` (UUID strings, optional; generated if omitted)
+- `waitForResult` (boolean, default false)
+
+**Output**
+- `accepted` with `requestId`, `sessionId`, `workflowRunId?`, `message` (when async)
+- `success` with `statusHistory[]`, `agentResponse`, `responsePayloadJson`, `requestLogId`, `monitoringRowId`, `responseStatus`, `isEdit`, `message` (when waiting)
+</Accordion>
+
+<Accordion title="k12-annex-editing-status">
+Return job status rows from `log_Jobs` for a list of request IDs.
+
+**Input**: `requestIds[]` (strings)
+
+**Output**: array of `{ requestId, sessionId, status }`
+</Accordion>
+
+<Accordion title="k12-annex-editing-result">
+Fetch the stored result for a request from `log_Jobs`.
+
+**Input**: `requestId` (string)
+
+**Output**: `{ requestId, sessionId, status, message, isEdit }`
+</Accordion>
+
+<Accordion title="k12-insert-task-request-log">
+Insert the normalized workflow payload into `log_EOP_TaskRequests`.
+
+**Input**
+- `taskName` (string, default "K12 Annex Workflow")
+- `requestId`, `sessionId` (strings, required)
+- `emergencyOperationPlanId`, `emergencyOperationPlanConfigurationId`, `userId`, `roleId` (optional strings)
+- `form.name`, `form.field.group|name|content` (optional strings)
+- `prompt`, `workflowRunId` (optional strings)
+
+**Output**: inserted row with IDs, request metadata, and nullable response fields.
+</Accordion>
+
+<Accordion title="k12-insert-task-in-monitoring-table">
+Insert a status row into `log_EOP_TaskStatus`.
+
+**Input**: `taskName` (default), `sessionId`, `requestId`, `status` (one of `accepted|processing|success|error|cancelled`), `message?`, `workflowRunId?`
+
+**Output**: inserted monitoring row.
+</Accordion>
+
+<Accordion title="k12-update-task-request-response">
+Update the request log with the model response.
+
+**Input**: `requestId`, `sessionId`, `responseStatus` (default "success"), `responseMessage`, `responseIsEdit?`, `rawResponseJson?`, `responsePayloadJson?`
+
+**Output**: updated request row with response fields populated.
+</Accordion>
+
+<Accordion title="k12-update-task-status">
+Update monitoring status for a request/session.
+
+**Input**: `sessionId`, `requestId`, `status` (accepted|processing|success|error|cancelled)
+
+**Output**: updated monitoring row.
+</Accordion>
+
+<Accordion title="k12-cancel-task-request">
+Mark request + status rows as cancelled and optionally cancel in-flight workflow runs (`K12_ENABLE_WORKFLOW_CANCELLATION=true`).
+
+**Input**: `requestId`
+
+**Output**: `{ status: "success" | "error", message? }`
+</Accordion>
+
+<Accordion title="k12-lkp-task-status-by-session-or-request">
+Fetch latest status from `log_EOP_TaskStatus`.
+
+**Input**: `requestId` (required), `sessionId?`
+
+**Output**: `{ requestId, sessionId, status }`
+</Accordion>
+
+<Accordion title="k12-lkp-task-request-result">
+Fetch latest stored response from `log_EOP_TaskRequests`.
+
+**Input**: `requestId` (required), `sessionId?`
+
+**Output**: `{ requestId, sessionId, status, message, isEdit } | null`
+</Accordion>
+
+<Accordion title="k12-get-emergency-operation-plan-snapshot">
+Call the K12 Safety REST API for snapshot metadata.
+
+**Input**: `emergencyOperationPlanId` (string), `latest` (bool, default true), `limit` (number, default 1), `offset` (number, default 0)
+
+**Output**: array of plan snapshot records validated against `emergencyOperationPlanSnapshotsOutputSchema`.
+</Accordion>
+</AccordionGroup>
 
 ## Annex tool endpoints (HTTP)
 
@@ -108,11 +213,11 @@ curl -X POST "$BASE/api/tools/k12-cancel-task-request/execute" \
 
 ## Workflow semantics
 
-- **IDs**: If callers omit `requestId`/`sessionId`, the workflow generates deterministic GUIDs from the input payload; stable for retries with identical input.
-- **Agent I/O**: The workflow builds a user message from plan + form + prompt and expects the agent to return JSON-friendly content (fields like `new_edition` or `answer`, plus optional `is_edit`).
-- **Persistence**: Request logs capture raw request/response JSON; monitoring rows capture status transitions; job rows mirror workflow run state.
-- **Async behavior**: Kickoff returns `accepted` immediately unless `waitForResult` is `true`, in which case it returns `success` after the workflow completes.
-- **Cancellation**: When `K12_ENABLE_WORKFLOW_CANCELLATION=true`, the cancel tool attempts both in-memory workflow handle cancellation and the Mastra API `/api/workflows/{id}/cancel` fallback.
+- **IDs**: If callers omit `requestId` or `sessionId`, the workflow creates deterministic GUIDs. Provide both IDs when you need strict correlation across tables and clients.
+- **Agent I/O**: The workflow builds a structured user message from plan identifiers, form field text, and prompt. The agent returns text plus JSON payload (`new_edition` or `answer`) and optional `is_edit`. LLM model/deployment and numeric knobs can be overridden via Agent Profiles.
+- **Persistence**: Request logs capture normalized input and response payloads; monitoring rows record status transitions; job rows mirror workflow run state. All writes happen through the tools to keep schemas consistent.
+- **Async behavior**: Kickoff returns `accepted` unless `waitForResult=true`, in which case it blocks until the workflow completes and returns `success` with the agent payload.
+- **Cancellation**: When `K12_ENABLE_WORKFLOW_CANCELLATION=true`, the cancel tool attempts both workflow-handle cancellation and the Mastra API `/api/workflows/{id}/cancel`; it always marks DB rows as `cancelled` with a reason.
 
 ## External API dependencies
 
@@ -121,9 +226,9 @@ curl -X POST "$BASE/api/tools/k12-cancel-task-request/execute" \
 
 ## Configuration (conceptual)
 
-- **K12 Safety API**: `K12_EOP_API_BASE_URL`, bearer or APIM keys (`K12_EOP_API_BEARER_TOKEN`, `K12_EOP_API_SUBSCRIPTION_KEY`), optional AAD client credentials (`K12_EOP_API_CLIENT_ID`, `K12_EOP_API_CLIENT_SECRET`, `K12_EOP_API_TENANT_ID`, `K12_EOP_API_SCOPE`).
+- **K12 Safety API**: `K12_EOP_API_BASE_URL`, bearer or APIM keys (`K12_EOP_API_BEARER_TOKEN`, `K12_EOP_API_SUBSCRIPTION_KEY`), optional AAD client credentials (`K12_EOP_API_CLIENT_ID`, `K12_EOP_API_CLIENT_SECRET`, `K12_EOP_API_TENANT_ID`, `K12_EOP_API_SCOPE`); timeouts via `K12_EOP_API_TIMEOUT_MS` (default 10s).
 - **Test overrides**: `K12_TEST_*` values fall back to `ANNEX_*` counterparts for integration tests and tool calls.
-- **Workflow controls**: `K12_ENABLE_WORKFLOW_CANCELLATION` toggles cancellation; `MASTRA_TARGET` selects runtime; model overrides live in Agent Profiles.
+- **Workflow controls**: `K12_ENABLE_WORKFLOW_CANCELLATION` toggles cancellation; `MASTRA_TARGET` selects runtime; model overrides live in Agent Profiles; OpenAI and Content Safety providers follow the shared Mastra env contract.
 
 ## Integration checkpoints
 

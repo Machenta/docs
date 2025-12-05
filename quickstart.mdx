@@ -1,16 +1,13 @@
 ---
 title: "Quickstart"
 description: "Start building awesome documentation in minutes"
-audience: ["dev","pm"]
 ---
 
 <link rel="stylesheet" href="/styles.css" />
 
 ## Quickstart: Previewing & Local Development
 
-This doc covers how to preview the documentation site.
-<audience data-audience="dev">It also shows how to run the Mastra runtime for local development.</audience>
-<audience data-audience="pm">Project managers: you typically don't need to run the runtime — reach out to the dev team if you need a local preview.</audience>
+This doc covers how to preview the documentation site. It also shows how to run the Mastra runtime for local development if you want to test flows end-to-end.
 The material below is a short version of the project README. For full details and advanced configuration, see the repository README at the project root.
 
 ### Step 1: Set up your local environment (Docs & Runtime)
@@ -26,38 +23,34 @@ The material below is a short version of the project README. For full details an
     To preview the documentation locally, follow the repository README instructions. This project does not require a specific documentation CLI; use the workflow or tooling that works best for your environment. If you use Mintlify for doc previews in development, refer to Mintlify's docs — but installing and running the Mintlify CLI is optional and not required for Mastra development.
   </Accordion>
 
-  <audience data-audience="dev">
-    <Accordion icon="rectangle-terminal" title="Start the Mastra runtime (optional)">
-      1. From the project root (Mastra repo) install dependencies:
-      ```bash
-      npm install
-      ```
-      2. Copy environment example to a working `.env` and update values:
-      ```powershell
-      copy .env.example .env
-      ```
-      3. Verify `.env` keys are present:
-      ```bash
-      npm run check:env
-      ```
-      4. Start the runtime (recommended):
-      ```powershell
-      pwsh ./scripts/start-dev.ps1   # Windows PowerShell recommended
-      # OR
-      npm run quickstart
-      # OR (simple dev script)
-      npm run dev
-      ```
+  <Accordion icon="rectangle-terminal" title="Start the Mastra runtime (optional)">
+    1. From the project root (Mastra repo) install dependencies:
+    ```bash
+    npm install
+    ```
+    2. Copy environment example to a working `.env` and update values:
+    ```powershell
+    copy .env.example .env
+    ```
+    3. Verify `.env` keys are present:
+    ```bash
+    npm run check:env
+    ```
+    4. Start the runtime (recommended):
+    ```powershell
+    pwsh ./scripts/start-dev.ps1   # Windows PowerShell recommended
+    # OR
+    npm run quickstart
+    # OR (simple dev script)
+    npm run dev
+    ```
 
-      5. The Mastra runtime exposes runtime endpoints and the registries view at `http://localhost:4111` when running locally. Use `GET /registries` or the small UI at `/registries` to inspect loaded agents, tools, and workflows.
-    </Accordion>
-  </audience>
-
-  <audience data-audience="pm">
-  <Accordion icon="rectangle-terminal" title="Local preview & note for project managers">
-    Project managers: you don't need to run the Mastra runtime. You can preview the docs or view the hosted environment when available; contact your dev team if you need access to runtime endpoints or registries.
+    5. The Mastra runtime exposes runtime endpoints and the registries view at `http://localhost:4111` when running locally. Use `GET /registries` or the small UI at `/registries` to inspect loaded agents, tools, and workflows.
   </Accordion>
-  </audience>
+
+  <Accordion icon="rectangle-terminal" title="Local preview">
+    You can preview the docs locally or use the hosted environment when available. If you need runtime endpoints or registries, start the runtime as above.
+  </Accordion>
 </AccordionGroup>
 
 ### Step 2: Deploy your changes
@@ -114,11 +107,5 @@ Now that you have your docs running, explore these key features:
 <Note>
   **Need help?** See the project README at the repo root for full developer instructions or open an issue if you need more context. Also, see Mintlify docs if you need help with the documentation platform.
 
-  **Audience-specific builds**: This repo supports filtering documentation for specific audiences (devs, project managers). To generate a PM- or Dev-specific build for sharing, run:
-
-  ```powershell
-  # From the docs folder
-  npm install && npm run build:docs:pm  # build docs for project managers
-  npm install && npm run build:docs:dev # build docs for developers
-  ```
+  **Audience-specific builds**: Removed. The docs now ship as a single unified set; use the standard repo workflows for previews and deployments.
 </Note>

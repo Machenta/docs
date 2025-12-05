@@ -1,53 +1,119 @@
 ---
 title: "K12 Safety Overview"
-description: "How the K12 Safety experience works for product stakeholders"
-audience: ["pm"]
+description: "Understanding the K12 Safety platform for school emergency planning"
+audience: ["pm", "ops"]
 ---
 
 <link rel="stylesheet" href="/styles.css" />
 
-## What it is
+# K12 Safety Overview
 
-The K12 Safety surface delivers guided emergency operations plan (EOP) editing and review. It pairs a domain-tuned agent with workflow automation and SQL-backed audit trails so districts can request, monitor, and finalize annex updates with traceability.
+K12 Safety provides a guided experience for districts to draft, edit, and approve Emergency Operations Plan (EOP) annexes. The platform combines AI assistance with structured workflows so your team can submit requests, monitor progress, and retrieve final edits with clear traceability.
 
-## Core capabilities
+---
 
-- **Annex editing workflow**: Accepts a form + prompt, routes through the K12 safety agent, and logs every step (request, monitoring status, model response) in `K12SAFETY` tables.
-- **Agent with governed prompts**: The `k12-safety-agent` pulls its instructions from the Agent Profiles service, enabling centralized prompt changes without code deploys.
-- **Status visibility**: Job rows in `log_Jobs` plus task status rows in `log_EOP_TaskStatus` keep operators informed (accepted → processing → success/error/cancelled).
-- **Result retrieval**: Final model responses are stored in `log_EOP_TaskRequests` and exposed via lookup tools so UIs can fetch the latest answer or edit decision.
-- **Plan snapshot access**: A dedicated tool hits the K12 Safety REST API to surface plan snapshot metadata for downstream review.
+## What You Can Do
 
-## How a request flows
+<CardGroup cols={2}>
+  <Card title="Create EOP Annexes" icon="file-pen">
+    Submit content or requests to generate new EOP annex sections with AI assistance.
+  </Card>
+  
+  <Card title="Edit Existing Content" icon="pen-to-square">
+    Provide existing plan content and request specific changes or improvements.
+  </Card>
+  
+  <Card title="Monitor Progress" icon="chart-line">
+    Track the status of your requests as they move through the workflow.
+  </Card>
+  
+  <Card title="Review Results" icon="check-circle">
+    Retrieve completed edits and review AI-generated suggestions before approval.
+  </Card>
+</CardGroup>
 
-1) **Kickoff** — A client calls the `k12-annex-editing-kickoff` tool (or the API wrapper). The request and session IDs are normalized; workflow metadata is persisted in `log_Jobs`.
-2) **Persist + monitor** — The workflow inserts the request payload into `log_EOP_TaskRequests` and creates a monitoring row in `log_EOP_TaskStatus` marked `processing`.
-3) **Agent generation** — The K12 agent receives a structured user message (plan, section, prompt). It returns an edit decision and content payload.
-4) **Response storage** — The workflow records the model output back into `log_EOP_TaskRequests` and marks status `success` (or `error` on failure).
-5) **Follow-up** — UIs can poll `k12-annex-editing-status` or fetch results via `k12-annex-editing-result` / lookup tools; cancellation is supported when enabled.
+---
 
-## Major components
+## How It Works
 
-- **Agent**: `eop-k12-safety-agent` (registry ID) / `k12-safety-agent` (profile ID). Uses Azure OpenAI via the project provider and respects model/temperature/top-p overrides from Agent Profiles.
-- **Workflow**: `k12-annex-workflow` normalizes input, persists logs, invokes the agent, and finalizes monitoring status. It commits each step for observability and recovery.
-- **Tools**: Tools wrap database writes/reads, workflow kickoff, cancellation, and K12 Safety API access. Tool IDs are stable (see API reference).
-- **Data plane**: SQL Server schema `K12SAFETY` stores job, status, and request logs. The plan snapshot tool calls the K12 Safety REST API.
+<Steps>
+  <Step title="Submit your request">
+    Provide the plan context and the content you want to create or edit. You can include specific instructions or let the AI suggest improvements.
+  </Step>
+  
+  <Step title="Processing">
+    The K12 Safety agent analyzes your request, applies school safety best practices, and generates draft content or edits.
+  </Step>
+  
+  <Step title="Monitor status">
+    While processing, you can check the status of your request at any time. You can also cancel requests if needed.
+  </Step>
+  
+  <Step title="Review and approve">
+    Once complete, review the results. All generated content includes traceability information so you know what was changed and why.
+  </Step>
+</Steps>
 
-## Operating environments
+---
 
-- **Target selection**: Set your environment selection to `k12` in the runtime configuration; development scripts honor this setting.
-- **Auth & connectivity**: K12 plan snapshots use either direct bearer/APIM keys or Azure AD client credentials. SQL access uses the configured runtime connection.
-- **Content safety**: Azure Content Safety is enabled through shared provider helpers; blocklists and thresholds are configurable via environment.
+## Key Features
 
-## What to watch for
+### Content Safety
 
-- **Identifiers**: Provide `requestId` and `sessionId` if you need strict correlation; otherwise they are generated deterministically.
-- **Async vs sync**: `waitForResult` controls whether kickoff returns immediately (`accepted`) or after the workflow completes (`success`).
-- **Cancellation**: When `K12_ENABLE_WORKFLOW_CANCELLATION=true`, the cancel tool will attempt both workflow-handle and API-based cancellation and still mark rows as cancelled.
-- **Plan coverage**: The snapshot tool defaults to the latest version and paginates; adjust `latest`, `limit`, and `offset` to broaden the view.
+All AI-generated content passes through Azure Content Safety checks before being returned. This ensures:
 
-## Roles and responsibilities
+- Appropriate language for school environments
+- Compliance with safety guidelines
+- No harmful or inappropriate suggestions
 
-- **Product/ops**: Define the desired annex edits and ensure the right form/prompt context is passed. Monitor job status and results via the exposed tools.
-- **Data/IT**: Maintain SQL connectivity and K12 Safety API credentials; keep blocklists and safety thresholds aligned with policy.
-- **Prompt owners**: Manage the `k12-safety-agent` profile in the Agent Profiles service to change tone, guardrails, or model settings without redeploying code.
+### Version Tracking
+
+Every edit creates a traceable record. You can:
+
+- View the history of changes to any plan section
+- See who requested changes and when
+- Compare versions to understand what was modified
+
+### Customizable AI Behavior
+
+Through the [Admin Dashboard](/customization/dashboard), prompt owners can:
+
+- Adjust the AI's tone and style
+- Set guardrails for content generation
+- Configure model settings without code changes
+
+---
+
+## Roles and Responsibilities
+
+| Role | Responsibilities |
+| ---- | ---------------- |
+| **Safety Coordinators / Product Ops** | Submit edit requests, define content requirements, review and approve results |
+| **Data / IT Teams** | Manage platform access, maintain credentials, configure safety thresholds |
+| **Prompt Owners** | Customize AI behavior through agent profiles, adjust tone and guardrails |
+
+---
+
+## Available Tools
+
+<CardGroup cols={2}>
+  <Card title="EOP (Emergency Operations Plan)" icon="file-shield" href="/k12/eop/overview">
+    Create and edit Emergency Operations Plan annexes with AI assistance.
+  </Card>
+  
+  <Card title="QRG (Quick Reference Guide)" icon="clipboard-list" href="/k12/qrg/overview">
+    Generate concise, actionable summaries for emergency responders.
+  </Card>
+</CardGroup>
+
+---
+
+## Learn More
+
+- **[EOP Overview](/k12/eop/overview)** — Detailed guide to EOP editing workflows
+- **[QRG Overview](/k12/qrg/overview)** — Quick Reference Guide generation
+- **[Admin Dashboard](/customization/dashboard)** — Customize AI settings and prompts
+
+<Info>
+For technical integration details (API endpoints, authentication, schemas), see the [EOP API Examples](/api-reference/eop/overview) in the EOP tab.
+</Info>

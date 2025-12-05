@@ -1,35 +1,64 @@
 ---
-title: 'Introduction'
-description: 'Example section for showcasing API endpoints'
+title: 'API Reference'
+description: 'Mastra API endpoints and specifications'
 ---
 
-<link rel="stylesheet" href="/styles.css" />
+# Mastra API
 
-<Note>
-  If you're not looking to build API reference documentation, you can delete
-  this section by removing the api-reference folder.
-</Note>
+The Mastra API provides endpoints for managing agents, workflows, memory, tools, and more.
 
-## Welcome
+## Base URLs
 
-There are two ways to build API documentation: [OpenAPI](https://mintlify.com/docs/api-playground/openapi/setup) and [MDX components](https://mintlify.com/docs/api-playground/mdx/configuration). For the starter kit, we are using the following OpenAPI specification.
+| Environment | Base URL |
+| --- | --- |
+| Local Development | `http://localhost:4111` |
+| K12 Azure Dev (APIM) | `https://aitools-dev-apim-k12.azure-api.net` |
 
-<Card
-  title="Plant Store Endpoints"
-  icon="leaf"
-  href="https://github.com/mintlify/starter/blob/main/api-reference/openapi.json"
->
-  View the OpenAPI specification file
-</Card>
+## Quick Links
 
-## Authentication
+<CardGroup cols={2}>
+  <Card title="EOP Examples" icon="file-code" href="/api-reference/eop/overview">
+    K12 Annex Editing Toolchain with authentication and workflow examples
+  </Card>
+  <Card title="Authentication" icon="key" href="/api-reference/eop/auth">
+    OAuth setup for K12 Azure Dev APIM
+  </Card>
+</CardGroup>
 
-All API endpoints are authenticated using Bearer tokens and picked up from the specification file.
+---
 
-```json
-"security": [
-  {
-    "bearerAuth": []
-  }
-]
-```
+## Available Endpoints
+
+### System
+- `GET /health` - Health check endpoint
+- `GET /api` - Get API status
+
+### Agents
+- `GET /api/agents` - Get all available agents
+- `GET /api/agents/{agentId}` - Get agent by ID
+- `POST /api/agents/{agentId}/generate` - Generate a response from an agent
+- `POST /api/agents/{agentId}/stream` - Stream a response from an agent
+
+### Workflows
+- `GET /api/workflows` - Get all workflows
+- `GET /api/workflows/{workflowId}` - Get workflow by ID
+- `POST /api/workflows/{workflowId}/start` - Start a workflow
+
+### Memory
+- `GET /api/memory/threads` - Get all threads
+- `POST /api/memory/threads` - Create a new thread
+- `GET /api/memory/threads/{threadId}/messages` - Get messages for a thread
+
+### MCP (Model Context Protocol)
+- `GET /api/mcp/v0/servers` - List all MCP servers
+- `GET /api/mcp/{serverId}/tools` - List tools for an MCP server
+
+### Tools
+- `GET /api/tools` - Get all tools
+- `POST /api/tools/{toolId}/execute` - Execute a tool
+
+### K12 Annex Tools
+- `POST /api/tools/k12-annex-editing-kickoff/execute` - [Start an annex edit job](/api-reference/eop/kickoff)
+- `POST /api/tools/k12-annex-editing-status/execute` - [Poll job progress](/api-reference/eop/status)
+- `POST /api/tools/k12-annex-editing-result/execute` - [Retrieve edited content](/api-reference/eop/result)
+- `POST /api/tools/k12-cancel-task-request/execute` - [Cancel a running job](/api-reference/eop/cancel)

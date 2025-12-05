@@ -1,0 +1,31 @@
+---
+title: "QRG Reference"
+description: "Placeholder for QRG APIs, payloads, and workflows as they are defined"
+audience: ["dev","pm"]
+---
+
+<link rel="stylesheet" href="/styles.css" />
+
+## What this page will contain
+
+This page is reserved for the Quick Reference Guide (QRG) integration surface. It will document the endpoints, request/response shapes, and workflows specific to creating, publishing, and retrieving QRGs once they are finalized.
+
+## How to work today
+
+- Author and review QRG content alongside the corresponding EOP annex so the two stay aligned.
+- Use your delivery channel (CMS, PDF generation, or app UI) to publish QRGs while the dedicated API surface is being finalized.
+- Track a stable QRG identifier and its source EOP annex ID so you can remap content when QRG tooling ships.
+
+## Planned coverage
+
+- QRG create/update/read endpoints or tools, including required identifiers and status vocabulary.
+- Expected payload fields (title, scenario, steps, roles, contact/owner, prerequisites, last-reviewed).
+- Versioning and publication states so downstream apps can detect stale content.
+- Webhook or polling approach for clients once QRG workflows are available.
+
+## Related pages
+
+- QRG overview: `/k12/qrg/overview`
+- EOP overview: `/k12/eop/overview`
+- EOP external reference: `/k12/external-reference`
+- EOP internal reference: `/k12/internal-reference`

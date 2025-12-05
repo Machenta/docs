@@ -1,37 +1,75 @@
 {
   "$schema": "https://mintlify.com/docs.json",
   "theme": "mint",
-  "name": "K12 AI Tools",
+  "name": "K12 Safety",
   "colors": {
     "primary": "#0F61D4",
     "light": "#E8F1FF",
     "dark": "#0C4EAF"
   },
   "favicon": "/favicon.svg",
+  "openapi": "api-reference/openapi.json",
   "navigation": {
     "tabs": [
       {
         "tab": "Guides",
         "groups": [
           {
-            "group": "Getting started",
+            "group": "Getting Started",
             "pages": [
               "index",
-              "quickstart",
-              "development"
-            ]
-          },
-          {
-            "group": "K12 Safety",
-            "pages": [
               "k12/overview"
             ]
           },
           {
             "group": "Customization",
             "pages": [
-              "essentials/settings",
-              "essentials/navigation"
+              "customization/dashboard"
+            ]
+          },
+          {
+            "group": "Developer Resources",
+            "pages": [
+              "quickstart",
+              "development"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "EOP",
+        "groups": [
+          {
+            "group": "EOP",
+            "pages": [
+              "k12/eop/overview",
+              "k12/eop/technical",
+              "k12/external-reference",
+              "k12/internal-reference",
+              "k12/eop/data-plane"
+            ]
+          },
+          {
+            "group": "EOP API Examples",
+            "pages": [
+              "api-reference/eop/overview",
+              "api-reference/eop/auth",
+              "api-reference/eop/kickoff",
+              "api-reference/eop/status",
+              "api-reference/eop/result",
+              "api-reference/eop/cancel"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "QRG",
+        "groups": [
+          {
+            "group": "QRG",
+            "pages": [
+              "k12/qrg/overview",
+              "k12/qrg/reference"
             ]
           }
         ]
@@ -40,43 +78,15 @@
         "tab": "API reference",
         "groups": [
           {
-            "group": "API documentation",
+            "group": "API Reference",
             "pages": [
               "api-reference/introduction"
-            ]
-          },
-          {
-            "group": "K12 Safety",
-            "pages": [
-              "api-reference/k12/overview"
-            ]
-          },
-          {
-            "group": "Endpoint examples",
-            "pages": [
-              "api-reference/endpoint/get",
-              "api-reference/endpoint/create",
-              "api-reference/endpoint/delete",
-              "api-reference/endpoint/webhook"
             ]
           }
         ]
       }
     ],
-    "global": {
-      "anchors": [
-        {
-          "anchor": "Documentation",
-          "href": "https://mintlify.com/docs",
-          "icon": "book-open-cover"
-        },
-        {
-          "anchor": "Blog",
-          "href": "https://mintlify.com/blog",
-          "icon": "newspaper"
-        }
-      ]
-    }
+    "global": {}
   },
   "logo": {
     "light": "/logo/light.svg",

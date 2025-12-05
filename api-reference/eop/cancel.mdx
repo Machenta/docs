@@ -1,0 +1,154 @@
+---
+title: 'Cancel'
+description: 'Stop a running job'
+---
+
+# Cancel - Stop a Running Job
+
+Cancels a queued or in-progress job. Use this to stop a job that is no longer needed, for example when a user navigates away or requests a different edit.
+
+## Endpoint
+
+| Attribute | Value |
+| --- | --- |
+| **URL** | `/api/tools/k12-cancel-task-request/execute` |
+| **Method** | `POST` |
+| **Auth** | [Required](/api-reference/eop/auth) |
+
+## Request
+
+<CodeGroup>
+```bash cURL
+curl -X POST "$BASE_URL/api/tools/k12-cancel-task-request/execute" \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Ocp-Apim-Subscription-Key: $SUBSCRIPTION_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "data": {
+      "requestId": "9fd2055d-42ab-4c29-bf0d-51bd8f7db3ec"
+    }
+  }'
+```
+
+```javascript JavaScript
+const response = await fetch(`${BASE_URL}/api/tools/k12-cancel-task-request/execute`, {
+  method: 'POST',
+  headers: {
+    'Authorization': `Bearer ${token}`,
+    'Ocp-Apim-Subscription-Key': subscriptionKey,
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    data: {
+      requestId: '9fd2055d-42ab-4c29-bf0d-51bd8f7db3ec'
+    }
+  })
+});
+
+const result = await response.json();
+if (result.status === 'success') {
+  console.log('Job cancelled successfully');
+}
+```
+
+```python Python
+import requests
+
+response = requests.post(
+    f"{BASE_URL}/api/tools/k12-cancel-task-request/execute",
+    headers={
+        "Authorization": f"Bearer {token}",
+        "Ocp-Apim-Subscription-Key": subscription_key,
+        "Content-Type": "application/json"
+    },
+    json={
+        "data": {
+            "requestId": "9fd2055d-42ab-4c29-bf0d-51bd8f7db3ec"
+        }
+    }
+)
+
+result = response.json()
+```
+</CodeGroup>
+
+## Request Body Fields
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `requestId` | string | ✅ | The kickoff `requestId` to cancel |
+| `sessionId` | string | ❌ | Not used; the tool identifies rows by `requestId` |
+
+## Response (Success)
+
+```json
+{
+  "status": "success"
+}
+```
+
+The job has been marked as cancelled and any running workflow has been stopped.
+
+## Response (Error)
+
+```json
+{
+  "status": "error",
+  "message": "No task status or request logs were affected; verify the provided identifiers."
+}
+```
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `status` | string | `error` when cancellation failed |
+| `message` | string | Describes why the cancellation failed |
+
+## When to Cancel
+
+- **User navigates away** - Cancel pending edits when the user leaves the edit screen
+- **User requests new edit** - Cancel the previous edit before starting a new one
+- **Timeout** - Cancel jobs that have been processing too long
+- **Error recovery** - Cancel stuck jobs before retrying
+
+## Example: Cancel on Navigation
+
+```javascript
+// Track active request
+let activeRequestId = null;
+
+async function startEdit(planId, content, prompt) {
+  // Cancel any existing request
+  if (activeRequestId) {
+    await cancelJob(activeRequestId);
+  }
+  
+  // Start new edit
+  const result = await kickoff(planId, content, prompt);
+  activeRequestId = result.requestId;
+  return result;
+}
+
+async function cancelJob(requestId) {
+  await fetch(`${BASE_URL}/api/tools/k12-cancel-task-request/execute`, {
+    method: 'POST',
+    headers,
+    body: JSON.stringify({ data: { requestId } })
+  });
+  activeRequestId = null;
+}
+
+// Cancel on page unload
+window.addEventListener('beforeunload', () => {
+  if (activeRequestId) {
+    // Use sendBeacon for reliable delivery during unload
+    navigator.sendBeacon(
+      `${BASE_URL}/api/tools/k12-cancel-task-request/execute`,
+      JSON.stringify({ data: { requestId: activeRequestId } })
+    );
+  }
+});
+```
+
+<Note>
+After cancelling, the [Status](/api-reference/eop/status) endpoint will return `status: "cancelled"` for that request.
+</Note>

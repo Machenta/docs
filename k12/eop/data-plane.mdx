@@ -1,0 +1,58 @@
+---
+title: "EOP Data Plane"
+description: "Tables and fields used by the K12 EOP annex workflow"
+audience: ["dev","pm"]
+---
+
+<link rel="stylesheet" href="/styles.css" />
+
+# EOP Data Plane
+
+Reference for the primary tables that capture annex job requests, statuses, and results.
+
+## Tables
+
+<AccordionGroup>
+<Accordion title="K12SAFETY.log_Jobs (job tracking)">
+- Purpose: Tracks job lifecycle for kickoff/status/result tools.
+- Key columns: `request_id`, `session_id`, `workflow_run_id`, `job_type`, `job_description`, `status`, `result_payload`, `error`, timestamps.
+- Behavior: Kickoff inserts `processing`; status tool reads from here.
+</Accordion>
+
+<Accordion title="K12SAFETY.log_EOP_TaskRequests (request + response log)">
+- Purpose: Stores normalized request payload and final response.
+- Key columns: `TaskName`, `RequestID`, `SessionID`, `EmergencyOperationPlanId`, `EmergencyOperationPlanConfigurationId`, `UserId`, `RoleId`, `FormName`, `FormFieldGroup`, `FormFieldName`, `FormFieldContent`, `RequestPrompt`, `ResponseStatus`, `ResponseMessage`, `ResponseIsEdit`, `ResponsePayloadJson`, `RawRequestJson`, `RawResponseJson`, timestamps.
+- Behavior: Insert tool seeds the row; update-response tool populates response fields after the agent run.
+</Accordion>
+
+<Accordion title="K12SAFETY.log_EOP_TaskStatus (monitoring)">
+- Purpose: Lightweight status tracking for polling.
+- Key columns: `TaskName`, `SessionID`, `RequestID`, `WorkflowRunId`, `Status`, `Message`, timestamps.
+- Behavior: Monitoring insert seeds `accepted/processing`; update-status tool moves to `success/error/cancelled`.
+</Accordion>
+</AccordionGroup>
+
+## Status vocabulary
+
+- `accepted` → job queued
+- `processing` → workflow running
+- `success` → edit completed and stored
+- `failed` | `error` → workflow or model error (check `Message` / `ResponseStatus`)
+- `cancelled` → job was cancelled (rows updated even if runtime cancel is disabled)
+
+## Identifiers and correlation
+
+- Always pass `requestId` and `sessionId` to keep rows aligned across tables and API calls.
+- If omitted, the workflow generates deterministic GUIDs based on the normalized payload (idempotent for identical inputs).
+
+## Tips
+
+- Write through tools, not direct SQL, to preserve normalization and retries.
+- Capture `workflowRunId` from kickoff when you need deeper tracing or cancellation.
+- Treat `ResponsePayloadJson` as the structured edit payload; `ResponseMessage` is human-readable.
+
+## Related docs
+
+- External API details: `/k12/external-reference`
+- Internal workflow details: `/k12/internal-reference`
+- Solution overview: `/k12/eop/technical`

@@ -1,69 +1,108 @@
 ---
-title: "Mastra K12 Safety"
-description: "Docs for the K12 Safety agent, workflows, and API surface"
-audience: ["dev","pm"]
+title: "K12 Safety Platform"
+description: "AI-powered tools for K-12 school safety planning and compliance"
 ---
 
-{/* Global brand CSS for K12 Safety */}
 <link rel="stylesheet" href="/styles.css" />
 
-
 <div className="hero" style={{ padding: '1.5rem 0', borderRadius: '8px' }}>
-  <h2>Welcome</h2>
-  <p>This site covers how to use the K12 Safety surface: the domain-tuned agent for Emergency Operations Plans, the annex editing workflow, and the tools/APIs that power them.</p>
+  <h2>Welcome to K12 Safety</h2>
+  <p>The K12 Safety platform provides AI-powered tools to help schools create, review, and maintain Emergency Operations Plans (EOPs) and Quick Reference Guides (QRGs).</p>
 </div>
 
-<Columns cols={3}>
-  <Card
-    title="K12 overview"
-    icon="shield-halved"
-    href="/k12/overview"
-  >
-    Understand the end-to-end flow, roles, and components.
+---
+
+## What is K12 Safety?
+
+K12 Safety is a suite of AI agents and workflows designed specifically for K-12 school safety planning. The platform helps you:
+
+- **Generate compliant EOP annexes** — AI-assisted drafting of emergency response procedures
+- **Review existing plans** — Automated analysis for gaps, compliance issues, and improvements
+- **Create Quick Reference Guides** — Condensed, actionable summaries for emergency responders
+- **Ensure consistency** — Standardized formatting and language across all documents
+
+<Info>
+All AI-generated content is reviewed for safety and appropriateness before being returned. The platform includes built-in content moderation and compliance checks.
+</Info>
+
+---
+
+## Key Features
+
+<CardGroup cols={2}>
+  <Card title="EOP Annex Editing" icon="file-pen" href="/k12/eop/overview">
+    Create and refine Emergency Operations Plan annexes with AI assistance. The workflow guides you through drafting, reviewing, and finalizing content.
   </Card>
-  <Card
-    title="Developer view"
-    icon="terminal"
-    href="/api-reference/k12/overview"
-  >
-    See tool IDs, workflow semantics, and integration checkpoints.
+  
+  <Card title="Quick Reference Guides" icon="clipboard-list" href="/k12/qrg/overview">
+    Generate concise, actionable guides that staff can use during emergencies. Automatically derived from your full EOP content.
   </Card>
-  <Card
-    title="Quickstart"
-    icon="rocket"
-    href="/quickstart"
-  >
-    Spin up the docs locally and browse the API reference.
+  
+  <Card title="Admin Dashboard" icon="sliders" href="/customization/dashboard">
+    Customize AI behavior, adjust prompts, and configure model settings without writing code. Manage agent profiles and track changes.
   </Card>
-</Columns>
-
-## For product & ops
-
-- What the annex editing workflow does, how status flows, and where results land.
-- Roles: product/ops inputs vs. prompt owners vs. data/IT caretakers.
-- Where to monitor jobs (`k12-annex-editing-status`) and fetch results (`k12-annex-editing-result`).
-
-## For developers
-
-- Tool endpoints (`/api/tools/{toolId}/execute`) and the K12 Safety REST snapshot call.
-- How `waitForResult`, cancellation, and ID correlation behave.
-- Config you need: `K12_EOP_API_*`, `K12_ENABLE_WORKFLOW_CANCELLATION`, provider env vars.
-
-## Jump to essentials
-
-<Columns cols={2}>
-  <Card
-    title="API reference"
-    icon="book-open"
-    href="/api-reference/introduction"
-  >
-    Explore the OpenAPI-backed endpoints and webhook examples.
+  
+  <Card title="Content Safety" icon="shield-check" href="/k12/overview">
+    Built-in content moderation ensures all generated content is appropriate, accurate, and compliant with school safety standards.
   </Card>
-  <Card
-    title="Writing docs"
-    icon="pen-fancy"
-    href="/essentials/settings"
-  >
-    Author and reuse content with MDX and snippets.
+</CardGroup>
+
+---
+
+## How It Works
+
+<Steps>
+  <Step title="Submit your request">
+    Provide the source document or describe the content you need. The platform accepts existing EOP documents, templates, or new content requests.
+  </Step>
+  
+  <Step title="AI processing">
+    The K12 Safety agent analyzes your input, applies domain-specific knowledge, and generates draft content following best practices for school safety planning.
+  </Step>
+  
+  <Step title="Review and refine">
+    Review the generated content, request modifications if needed, and approve the final version. All changes are tracked for audit purposes.
+  </Step>
+  
+  <Step title="Export and use">
+    Download completed documents in your preferred format. Content is ready for integration into your school's emergency planning materials.
+  </Step>
+</Steps>
+
+---
+
+## Who Uses K12 Safety?
+
+| Role | How They Use the Platform |
+| ---- | ------------------------- |
+| **Safety Coordinators** | Create and update EOP annexes, generate QRGs |
+| **School Administrators** | Review and approve emergency plans |
+| **District Staff** | Ensure consistency across multiple schools |
+| **Operations Teams** | Monitor job status and manage workflows |
+
+---
+
+## Getting Started
+
+<CardGroup cols={3}>
+  <Card title="K12 Overview" icon="shield-halved" href="/k12/overview">
+    Understand the platform components and how they work together.
   </Card>
-</Columns>
+  
+  <Card title="EOP Workflows" icon="diagram-project" href="/k12/eop/overview">
+    Learn how to use the EOP editing and generation features.
+  </Card>
+  
+  <Card title="Admin Dashboard" icon="gauge" href="/customization/dashboard">
+    Configure AI settings and manage agent behavior.
+  </Card>
+</CardGroup>
+
+---
+
+## Need Help?
+
+- **For platform access** — Contact your IT administrator
+- **For workflow questions** — See the [EOP Overview](/k12/eop/overview) or [QRG Overview](/k12/qrg/overview)
+- **For customization** — See the [Admin Dashboard guide](/customization/dashboard)
+- **For developers** — See the [Development guide](/development)

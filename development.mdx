@@ -1,7 +1,6 @@
 ---
 title: 'Development'
 description: 'Preview changes locally to update your docs'
-audience: ["dev"]
 ---
 
 <link rel="stylesheet" href="/styles.css" />
@@ -45,6 +44,41 @@ When running the runtime locally the registries UI is available at `http://local
 </Step>
 </Steps>
 
+## Authentication and base URLs for K12 annex tools
+
+Use these settings when calling the K12 annex tools from local scripts or Postman.
+
+**OAuth (APIM path)**
+
+- OAuth tenant: `https://login.microsoftonline.com/{TENANT_ID}/oauth2/v2.0/token`
+- Scope: `api://k12-api-dev/.default`
+- Grant type: `client_credentials`
+- Required headers: `Authorization: Bearer {access_token}`, `Ocp-Apim-Subscription-Key: {subscription_key}`, `Content-Type: application/json`
+
+**Environment variables**
+
+| Variable | Description |
+| --- | --- |
+| `CLIENT_ID` | Azure AD app id that has access to the K12 annex API scope |
+| `CLIENT_SECRET` | Client secret for the Azure AD app |
+| `TENANT_ID` | Directory/tenant containing the app registration |
+| `ANNEX_SUBSCRIPTION_KEY` | APIM subscription key; optional for pure OAuth but required for the K12 Azure Dev APIM |
+| `ANNEX_BASE_URL` | Overrides the base URL (e.g., point scripts at the APIM host) |
+
+**Base URLs**
+
+| Environment | Base URL |
+| --- | --- |
+| K12 Azure Dev (APIM) | `https://aitools-dev-apim-k12.azure-api.net` |
+| Local development | `http://localhost:3001/development` |
+
+**Local dev JWT flow (no APIM)**
+
+1) Open `http://localhost:3001/development` in a browser.
+2) Authenticate with your test credentials.
+3) Copy the returned JWT from the response body or network tab.
+4) Use `Authorization: Bearer <token>` for local tool calls; `Ocp-Apim-Subscription-Key` is not needed for local.
+
 ## Running the Mastra runtime locally
 
 Use the Mastra `start-dev` script to bootstrap `.env` and warm the registry during local development. This script is helpful for preparing runtime dependencies and starting the server in a reproducible way.
@@ -72,48 +106,6 @@ pwsh ./scripts/start-dev.ps1
 - `npm test` — run integration tests against a local `BASE_URL` (default `http://localhost:4111`)
 
 For a comprehensive walkthrough and troubleshooting guides, see the repository README.
-
-## Custom ports
-
-By default, Mintlify uses port 3000. You can customize the port Mintlify runs on by using the `--port` flag. For example, to run Mintlify on port 3333, use this command:
-
-```bash
-mint dev --port 3333
-```
-
-If you attempt to run Mintlify on a port that's already in use, it will use the next available port:
-
-```md
-Port 3000 is already in use. Trying 3001 instead.
-```
-
-## Mintlify versions
-
-Please note that each CLI release is associated with a specific version of Mintlify. If your local preview does not align with the production version, please update the CLI:
-
-```bash
-npm mint update
-```
-
-## Validating links
-
-The CLI can assist with validating links in your documentation. To identify any broken links, use the following command:
-
-```bash
-mint broken-links
-```
-
-## Deployment
-
-If the deployment is successful, you should see the following:
-
-<Frame>
-  <img src="/images/checks-passed.png" alt="Screenshot of a deployment confirmation message that says All checks have passed." style={{ borderRadius: '0.5rem' }} />
-</Frame>
-
-## Code formatting
-
-We suggest using extensions on your IDE to recognize and format MDX. If you're a VSCode user, consider the [MDX VSCode extension](https://marketplace.visualstudio.com/items?itemName=unifiedjs.vscode-mdx) for syntax highlighting, and [Prettier](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode) for code formatting.
 
 ## Troubleshooting
 

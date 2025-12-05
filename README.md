@@ -1,6 +1,6 @@
-# Repository docs (Mintlify)
+# Repository docs (K12 Safety)
 
-This repo contains the Mintlify documentation site for the project (the docs/ folder is its own repo). It includes audience-specific builds for PMs vs developers and ships with Mintlify components and MDX content.
+This repo contains the Mintlify documentation site for the project (the docs/ folder is its own repo) using the standard Mintlify dev flow.
 
 ## Prerequisites
 - Node 20+
@@ -8,18 +8,16 @@ This repo contains the Mintlify documentation site for the project (the docs/ fo
 - Optional: Mintlify CLI (`npm i -g mint`) for live preview
 
 ## Local preview
-- Run `mint dev` from this folder (where `docs.json` lives).
-- Preview opens at `http://localhost:3000`.
+- Run `npm run docs:dev` from this folder (where `docs.json` lives); this runs `mint dev`.
+- Preview opens at `http://localhost:3000` (or the next open port).
 
-## Audience-specific builds
-- PM build: `npm run build:docs:pm`
-- Dev build: `npm run build:docs:dev`
-- Builds go to `./build/pm` and `./build/dev` and filter pages + inline `<audience data-audience="pm|dev">` blocks via `scripts/generate-audience-docs.mjs`.
+## Production
+- Mintlify does not expose a separate local "production server" command. Push your docs to the Mintlify-managed hosting or your deployment pipeline; use `mint dev` locally for preview.
 
 ## Project structure
 - `docs.json` — navigation, theme, branding
 - `index.mdx`, `quickstart.mdx`, `development.mdx` — core guides
-- `essentials/`, `ai-tools/`, `api-reference/` — topical content
+- `essentials/`, `api-reference/` — topical content
 - `snippets/` — reusable MDX snippets imported with root paths like `/snippets/snippet-intro.mdx`
 - `scripts/generate-audience-docs.mjs` — audience filter and asset copy helper
 

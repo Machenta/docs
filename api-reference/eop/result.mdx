@@ -1,0 +1,133 @@
+---
+title: 'Result'
+description: 'Retrieve edited content'
+---
+
+# Result - Retrieve Edited Content
+
+Returns the normalized agent output after the workflow succeeds. Only call this endpoint after the [Status](/api-reference/eop/status) endpoint returns `success`.
+
+## Endpoint
+
+| Attribute | Value |
+| --- | --- |
+| **URL** | `/api/tools/k12-annex-editing-result/execute` |
+| **Method** | `POST` |
+| **Auth** | [Required](/api-reference/eop/auth) |
+
+## Request
+
+<CodeGroup>
+```bash cURL
+curl -X POST "$BASE_URL/api/tools/k12-annex-editing-result/execute" \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Ocp-Apim-Subscription-Key: $SUBSCRIPTION_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "data": {
+      "requestId": "9fd2055d-42ab-4c29-bf0d-51bd8f7db3ec"
+    }
+  }'
+```
+
+```javascript JavaScript
+const response = await fetch(`${BASE_URL}/api/tools/k12-annex-editing-result/execute`, {
+  method: 'POST',
+  headers: {
+    'Authorization': `Bearer ${token}`,
+    'Ocp-Apim-Subscription-Key': subscriptionKey,
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    data: {
+      requestId: '9fd2055d-42ab-4c29-bf0d-51bd8f7db3ec'
+    }
+  })
+});
+
+const result = await response.json();
+console.log(result.message); // The edited HTML content
+```
+
+```python Python
+import requests
+
+response = requests.post(
+    f"{BASE_URL}/api/tools/k12-annex-editing-result/execute",
+    headers={
+        "Authorization": f"Bearer {token}",
+        "Ocp-Apim-Subscription-Key": subscription_key,
+        "Content-Type": "application/json"
+    },
+    json={
+        "data": {
+            "requestId": "9fd2055d-42ab-4c29-bf0d-51bd8f7db3ec"
+        }
+    }
+)
+
+result = response.json()
+edited_content = result["message"]
+```
+</CodeGroup>
+
+## Request Body Fields
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `requestId` | UUID | ✅ | The kickoff job id to retrieve |
+
+## Response (Success)
+
+```json
+{
+  "requestId": "9fd2055d-42ab-4c29-bf0d-51bd8f7db3ec",
+  "sessionId": "0e1a5e3f-3a3c-4d1f-bbc6-0e76b1c4a8c7",
+  "status": "success",
+  "message": "<p>Edited annex text with two bullet points:</p><ul><li>First action item</li><li>Second action item</li></ul>",
+  "isEdit": true
+}
+```
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `requestId` | UUID | Mirrors the requested job id |
+| `sessionId` | UUID | Session correlation id |
+| `status` | string | `success` when the edit is available |
+| `message` | string | HTML or markdown output with the revised annex text |
+| `isEdit` | boolean | `true` when the payload represents an edit |
+
+## Response (Failed)
+
+If the job failed, the response includes an error:
+
+```json
+{
+  "requestId": "9fd2055d-42ab-4c29-bf0d-51bd8f7db3ec",
+  "sessionId": "0e1a5e3f-3a3c-4d1f-bbc6-0e76b1c4a8c7",
+  "status": "failed",
+  "error": "Content moderation flagged inappropriate content"
+}
+```
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `error` | string | Describes the failure cause |
+
+<Warning>
+If you call this endpoint before the job completes, or if the job failed without storing a result, the tool throws `Request does not have a stored result payload`. Always check [Status](/api-reference/eop/status) first.
+</Warning>
+
+## Using the Result
+
+The `message` field contains HTML that can be directly inserted into your EOP form:
+
+```javascript
+const result = await getResult(requestId);
+
+// Update your form field with the edited content
+document.getElementById('annex-content').innerHTML = result.message;
+
+// Or send to your backend
+await updateAnnexContent(planId, result.message);
+```

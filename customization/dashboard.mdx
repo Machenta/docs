@@ -1,0 +1,163 @@
+---
+title: "Admin Dashboard"
+description: "How to customize AI agent behavior using the Admin Dashboard"
+audience: ["pm", "ops"]
+---
+
+<link rel="stylesheet" href="/styles.css" />
+
+# Admin Dashboard
+
+The Admin Dashboard is a web-based interface that allows you to customize AI agent behavior without writing code. From the dashboard you can:
+
+- **Edit system prompts** — change the instructions that guide how agents respond
+- **Select AI models** — choose which deployment and model an agent uses
+- **Tune generation settings** — adjust creativity, response length, and other parameters
+- **Track changes** — view version history and revert to previous configurations
+
+<Info>
+Your organization's Admin Dashboard URL is provided by your IT team or system administrator. If you need APIM authentication, append `?subscription-key=YOUR_KEY` to the URL.
+</Info>
+
+---
+
+## Navigating the Dashboard
+
+The dashboard has two main sections:
+
+| Section | Purpose |
+| ------- | ------- |
+| **LLM Parameters** | Global defaults for AI model behavior (temperature, response length, etc.) |
+| **Agent Profiles** | Per-agent customization (system prompts, model overrides, notes) |
+
+---
+
+## LLM Parameters (Global Defaults)
+
+Use this section to set organization-wide defaults for AI behavior. These settings apply to all agents unless overridden at the agent level.
+
+### What you can configure
+
+| Setting | Description |
+| ------- | ----------- |
+| **Deployment** | The Azure OpenAI deployment to use |
+| **Temperature** | Controls creativity (0 = focused, 1 = creative) |
+| **Top P** | Alternative creativity control (nucleus sampling) |
+| **Max Output Tokens** | Maximum response length |
+| **Frequency Penalty** | Reduces repetition of words |
+| **Presence Penalty** | Encourages new topics |
+| **Notes** | Internal notes for your team |
+
+### How to edit global defaults
+
+1. Select a deployment card from the list
+2. Adjust the sliders or input fields
+3. Click **Save** to apply changes
+
+<Tip>
+Some settings may be disabled if the selected model doesn't support them. The dashboard automatically hides or locks unsupported options.
+</Tip>
+
+### Version history
+
+Every save creates a new version. Click the **History** toggle on any card to view and restore previous configurations.
+
+---
+
+## Agent Profiles (Per-Agent Settings)
+
+Use this section to customize individual agents. Each agent can have its own system prompt, model selection, and generation settings.
+
+### What you can configure
+
+| Field | Required | Description |
+| ----- | -------- | ----------- |
+| **Agent ID** | Yes | The unique identifier for the agent |
+| **Alias** | No | A friendly name for display |
+| **System Prompt** | Yes | Instructions that define how the agent behaves |
+| **Notes** | No | Internal notes for your team |
+| **Metadata** | No | Additional configuration (JSON format) |
+| **Model Overrides** | No | Override the global deployment/model for this agent |
+| **Generation Overrides** | No | Override temperature, max tokens, etc. for this agent |
+
+### How to edit an agent profile
+
+1. Find the agent in the list or use the search/filter
+2. Click **Edit** on the agent card
+3. Update the system prompt, notes, or any override settings
+4. Click **Save**
+
+The dashboard will show the new version and update the agent card.
+
+### Understanding overrides
+
+Agents inherit global LLM parameters by default. When you set an override:
+
+- **Model override** — The agent uses a different deployment/model than the global default
+- **Generation override** — The agent uses different temperature/max tokens/etc.
+
+The dashboard shows **Resolved values** so you can see the effective configuration after all overrides are applied.
+
+### Version history and rollback
+
+Each save creates a new version of the agent profile. To restore a previous version:
+
+1. Click **History** on the agent card
+2. Find the version you want
+3. Click **Use this version** to load it into the editor
+4. Review and click **Save** to apply
+
+---
+
+## Best Practices
+
+<AccordionGroup>
+  <Accordion title="Writing effective system prompts">
+    - Be specific about the agent's role and audience
+    - Include examples of desired response format
+    - Specify any constraints (length, tone, topics to avoid)
+    - Test changes with representative queries before rolling out
+  </Accordion>
+
+  <Accordion title="Choosing temperature settings">
+    - **Lower (0.0–0.3)** — Best for factual, consistent responses (compliance, data extraction)
+    - **Medium (0.4–0.7)** — Balanced creativity and accuracy (general assistance)
+    - **Higher (0.8–1.0)** — Best for creative tasks (brainstorming, drafting)
+  </Accordion>
+
+  <Accordion title="Managing multiple agents">
+    - Use clear, descriptive Agent IDs and Aliases
+    - Document changes in the Notes field
+    - Review version history before making major changes
+    - Coordinate with your team when editing shared agents
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Frequently Asked Questions
+
+<AccordionGroup>
+  <Accordion title="Who can access the Admin Dashboard?">
+    Access is controlled by your organization's IT team. Contact your administrator for access or if you need elevated permissions.
+  </Accordion>
+
+  <Accordion title="Will my changes take effect immediately?">
+    Yes, saved changes apply immediately to new requests. In-flight requests will complete with the previous configuration.
+  </Accordion>
+
+  <Accordion title="Can I undo a change?">
+    Yes. Use the History feature on any card to view and restore previous versions.
+  </Accordion>
+
+  <Accordion title="What happens if I leave an override blank?">
+    The agent will use the global default for that setting.
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Related Documentation
+
+- [Overview](/index) — Introduction to the K12 Safety platform
+- [EOP Overview](/k12/eop/overview) — Emergency Operations Plan workflows
