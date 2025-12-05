@@ -62,5 +62,5 @@ jobs:
           # Add built files
           git add -A
           git commit -m "Publish public docs from main: $GITHUB_SHA" || true
-          git push --force "https://${GH_TOKEN}@github.com/${{ github.repository }}" production
+          git push --force "https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}" production
 
