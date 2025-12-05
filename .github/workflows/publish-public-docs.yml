@@ -32,7 +32,7 @@ jobs:
       - name: Validate no internal content in build
         run: |
           set -e
-          cd docs/build/public || (echo "ERROR: build/public missing" && exit 1)
+          cd build/public || (echo "ERROR: build/public missing" && exit 1)
           # check for frontmatter flags that indicate internal content
           if grep -R --line-number -E "internal:\s*true|visibility:\s*\"internal\"" .; then
             echo "ERROR: Found internal pages in the build! Aborting."
@@ -41,7 +41,7 @@ jobs:
 
       - name: Validate build isn't empty
         run: |
-          cd docs/build/public || (echo "ERROR: build/public missing" && exit 1)
+          cd build/public || (echo "ERROR: build/public missing" && exit 1)
           if [ -z "$(ls -A .)" ]; then
             echo "ERROR: build/public directory is empty"
             exit 1
@@ -52,7 +52,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -e
-          cd docs/build/public
+          cd build/public
           git init
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
