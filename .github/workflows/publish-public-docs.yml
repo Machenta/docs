@@ -23,13 +23,11 @@ jobs:
         with:
           node-version: 20
 
-      - name: Install deps (docs)
+      - name: Install deps
         run: npm ci
-        working-directory: ./docs
 
       - name: Build filtered public docs
         run: npm run docs:build:public
-        working-directory: ./docs
 
       - name: Validate no internal content in build
         run: |
