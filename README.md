@@ -1,43 +1,39 @@
-# Mintlify Starter Kit
+# Repository docs (Mintlify)
 
-Use the starter kit to get your docs deployed and ready to customize.
+This repo contains the Mintlify documentation site for the project (the docs/ folder is its own repo). It includes audience-specific builds for PMs vs developers and ships with Mintlify components and MDX content.
 
-Click the green **Use this template** button at the top of this repo to copy the Mintlify starter kit. The starter kit contains examples with
+## Prerequisites
+- Node 20+
+- `npm install` (run in this folder) to get local dependencies
+- Optional: Mintlify CLI (`npm i -g mint`) for live preview
 
-- Guide pages
-- Navigation
-- Customizations
-- API reference pages
-- Use of popular components
+## Local preview
+- Run `mint dev` from this folder (where `docs.json` lives).
+- Preview opens at `http://localhost:3000`.
 
-**[Follow the full quickstart guide](https://starter.mintlify.com/quickstart)**
+## Audience-specific builds
+- PM build: `npm run build:docs:pm`
+- Dev build: `npm run build:docs:dev`
+- Builds go to `./build/pm` and `./build/dev` and filter pages + inline `<audience data-audience="pm|dev">` blocks via `scripts/generate-audience-docs.mjs`.
 
-## Development
+## Project structure
+- `docs.json` — navigation, theme, branding
+- `index.mdx`, `quickstart.mdx`, `development.mdx` — core guides
+- `essentials/`, `ai-tools/`, `api-reference/` — topical content
+- `snippets/` — reusable MDX snippets imported with root paths like `/snippets/snippet-intro.mdx`
+- `scripts/generate-audience-docs.mjs` — audience filter and asset copy helper
 
-Install the [Mintlify CLI](https://www.npmjs.com/package/mint) to preview your documentation changes locally. To install, use the following command:
+## Authoring guidelines
+- Use Mintlify MDX components (Accordions, Steps, Tabs, CodeGroup, Tip/Warning/Note) and keep headings descriptive.
+- Write in second person, active voice; keep paragraphs short and scannable.
+- Use `/snippets/...` absolute imports for snippets and images to avoid build warnings.
+- Wrap audience-specific text in `<audience data-audience="dev">...</audience>` or `data-audience="pm"`.
 
-```
-npm i -g mint
-```
+## Troubleshooting
+- If pages 404 or nav warns: ensure the file path exists and is listed in `docs.json` (and included for the target audience).
+- If snippet imports fail: confirm the file is in `snippets/` and the import path starts with `/snippets/`.
+- Update the Mintlify CLI if preview misbehaves: `mint update`.
 
-Run the following command at the root of your documentation, where your `docs.json` is located:
-
-```
-mint dev
-```
-
-View your local preview at `http://localhost:3000`.
-
-## Publishing changes
-
-Install our GitHub app from your [dashboard](https://dashboard.mintlify.com/settings/organization/github-app) to propagate changes from your repo to your deployment. Changes are deployed to production automatically after pushing to the default branch.
-
-## Need help?
-
-### Troubleshooting
-
-- If your dev environment isn't running: Run `mint update` to ensure you have the most recent version of the CLI.
-- If a page loads as a 404: Make sure you are running in a folder with a valid `docs.json`.
-
-### Resources
-- [Mintlify documentation](https://mintlify.com/docs)
+## Resources
+- Mintlify docs: https://mintlify.com/docs
+- Quickstart reference: https://starter.mintlify.com/quickstart

@@ -1,0 +1,17 @@
+{
+  "name": "mastra-docs",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build:docs:dev": "node ./scripts/generate-audience-docs.mjs dev",
+    "build:docs:pm": "node ./scripts/generate-audience-docs.mjs pm",
+    "preview:pm": "cd build/pm && npx mint dev",
+    "preview:dev": "cd build/dev && npx mint dev",
+    "preview:pm:local": "cd build/pm && npx http-server -p 8080",
+    "preview:dev:local": "cd build/dev && npx http-server -p 8080"
+  },
+  "dependencies": {
+    "gray-matter": "^4.0.3"
+  }
+}

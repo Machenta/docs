@@ -1,97 +1,69 @@
 ---
-title: "Introduction"
-description: "Welcome to the new home for your documentation"
+title: "Mastra K12 Safety"
+description: "Docs for the K12 Safety agent, workflows, and API surface"
+audience: ["dev","pm"]
 ---
 
-## Setting up
+{/* Global brand CSS for K12 Safety */}
+<link rel="stylesheet" href="/styles.css" />
 
-Get your documentation site up and running in minutes.
 
-<Card
-  title="Start here"
-  icon="rocket"
-  href="/quickstart"
-  horizontal
->
-  Follow our three step quickstart guide.
-</Card>
+<div className="hero" style={{ padding: '1.5rem 0', borderRadius: '8px' }}>
+  <h2>Welcome</h2>
+  <p>This site covers how to use the K12 Safety surface: the domain-tuned agent for Emergency Operations Plans, the annex editing workflow, and the tools/APIs that power them.</p>
+</div>
 
-## Make it yours
+<Columns cols={3}>
+  <Card
+    title="K12 overview"
+    icon="shield-halved"
+    href="/k12/overview"
+  >
+    Understand the end-to-end flow, roles, and components.
+  </Card>
+  <Card
+    title="Developer view"
+    icon="terminal"
+    href="/api-reference/k12/overview"
+  >
+    See tool IDs, workflow semantics, and integration checkpoints.
+  </Card>
+  <Card
+    title="Quickstart"
+    icon="rocket"
+    href="/quickstart"
+  >
+    Spin up the docs locally and browse the API reference.
+  </Card>
+</Columns>
 
-Design a docs site that looks great and empowers your users.
+## For product & ops
+
+- What the annex editing workflow does, how status flows, and where results land.
+- Roles: product/ops inputs vs. prompt owners vs. data/IT caretakers.
+- Where to monitor jobs (`k12-annex-editing-status`) and fetch results (`k12-annex-editing-result`).
+
+## For developers
+
+- Tool endpoints (`/api/tools/{toolId}/execute`) and the K12 Safety REST snapshot call.
+- How `waitForResult`, cancellation, and ID correlation behave.
+- Config you need: `K12_EOP_API_*`, `K12_ENABLE_WORKFLOW_CANCELLATION`, provider env vars.
+
+## Jump to essentials
 
 <Columns cols={2}>
   <Card
-    title="Edit locally"
-    icon="pen-to-square"
-    href="/development"
-  >
-    Edit your docs locally and preview them in real time.
-  </Card>
-  <Card
-    title="Customize your site"
-    icon="palette"
-    href="/essentials/settings"
-  >
-    Customize the design and colors of your site to match your brand.
-  </Card>
-    <Card
-    title="Set up navigation"
-    icon="map"
-    href="/essentials/navigation"
-  >
-    Organize your docs to help users find what they need and succeed with your product.
-  </Card>
-  <Card
-    title="API documentation"
-    icon="terminal"
+    title="API reference"
+    icon="book-open"
     href="/api-reference/introduction"
   >
-    Auto-generate API documentation from OpenAPI specifications.
+    Explore the OpenAPI-backed endpoints and webhook examples.
   </Card>
-</Columns>
-
-## Create beautiful pages
-
-Everything you need to create world-class documentation.
-
-<Columns cols={2}>
   <Card
-    title="Write with MDX"
+    title="Writing docs"
     icon="pen-fancy"
-    href="/essentials/markdown"
+    href="/essentials/settings"
   >
-    Use MDX to style your docs pages.
-  </Card>
-  <Card
-    title="Code samples"
-    icon="code"
-    href="/essentials/code"
-  >
-    Add sample code to demonstrate how to use your product.
-  </Card>
-  <Card
-    title="Images"
-    icon="image"
-    href="/essentials/images"
-  >
-    Display images and other media.
-  </Card>
-  <Card
-    title="Reusable snippets"
-    icon="recycle"
-    href="/essentials/reusable-snippets"
-  >
-    Write once and reuse across your docs.
+    Author and reuse content with MDX and snippets.
   </Card>
 </Columns>
-
-## Need inspiration?
-
-<Card
-  title="See complete examples"
-  icon="stars"
-  href="https://mintlify.com/customers"
->
-  Browse our showcase of exceptional documentation sites.
-</Card>

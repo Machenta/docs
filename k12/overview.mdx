@@ -1,0 +1,53 @@
+---
+title: "K12 Safety Overview"
+description: "How the K12 Safety experience works for product stakeholders"
+audience: ["pm"]
+---
+
+<link rel="stylesheet" href="/styles.css" />
+
+## What it is
+
+The K12 Safety surface delivers guided emergency operations plan (EOP) editing and review. It pairs a domain-tuned agent with workflow automation and SQL-backed audit trails so districts can request, monitor, and finalize annex updates with traceability.
+
+## Core capabilities
+
+- **Annex editing workflow**: Accepts a form + prompt, routes through the K12 safety agent, and logs every step (request, monitoring status, model response) in `K12SAFETY` tables.
+- **Agent with governed prompts**: The `k12-safety-agent` pulls its instructions from the Agent Profiles service, enabling centralized prompt changes without code deploys.
+- **Status visibility**: Job rows in `log_Jobs` plus task status rows in `log_EOP_TaskStatus` keep operators informed (accepted → processing → success/error/cancelled).
+- **Result retrieval**: Final model responses are stored in `log_EOP_TaskRequests` and exposed via lookup tools so UIs can fetch the latest answer or edit decision.
+- **Plan snapshot access**: A dedicated tool hits the K12 Safety REST API to surface plan snapshot metadata for downstream review.
+
+## How a request flows
+
+1) **Kickoff** — A client calls the `k12-annex-editing-kickoff` tool (or the API wrapper). The request and session IDs are normalized; workflow metadata is persisted in `log_Jobs`.
+2) **Persist + monitor** — The workflow inserts the request payload into `log_EOP_TaskRequests` and creates a monitoring row in `log_EOP_TaskStatus` marked `processing`.
+3) **Agent generation** — The K12 agent receives a structured user message (plan, section, prompt). It returns an edit decision and content payload.
+4) **Response storage** — The workflow records the model output back into `log_EOP_TaskRequests` and marks status `success` (or `error` on failure).
+5) **Follow-up** — UIs can poll `k12-annex-editing-status` or fetch results via `k12-annex-editing-result` / lookup tools; cancellation is supported when enabled.
+
+## Major components
+
+- **Agent**: `eop-k12-safety-agent` (registry ID) / `k12-safety-agent` (profile ID). Uses Azure OpenAI via the project provider and respects model/temperature/top-p overrides from Agent Profiles.
+- **Workflow**: `k12-annex-workflow` normalizes input, persists logs, invokes the agent, and finalizes monitoring status. It commits each step for observability and recovery.
+- **Tools**: Tools wrap database writes/reads, workflow kickoff, cancellation, and K12 Safety API access. Tool IDs are stable (see API reference).
+- **Data plane**: SQL Server schema `K12SAFETY` stores job, status, and request logs. The plan snapshot tool calls the K12 Safety REST API.
+
+## Operating environments
+
+- **Target selection**: Set your environment selection to `k12` in the runtime configuration; development scripts honor this setting.
+- **Auth & connectivity**: K12 plan snapshots use either direct bearer/APIM keys or Azure AD client credentials. SQL access uses the configured runtime connection.
+- **Content safety**: Azure Content Safety is enabled through shared provider helpers; blocklists and thresholds are configurable via environment.
+
+## What to watch for
+
+- **Identifiers**: Provide `requestId` and `sessionId` if you need strict correlation; otherwise they are generated deterministically.
+- **Async vs sync**: `waitForResult` controls whether kickoff returns immediately (`accepted`) or after the workflow completes (`success`).
+- **Cancellation**: When `K12_ENABLE_WORKFLOW_CANCELLATION=true`, the cancel tool will attempt both workflow-handle and API-based cancellation and still mark rows as cancelled.
+- **Plan coverage**: The snapshot tool defaults to the latest version and paginates; adjust `latest`, `limit`, and `offset` to broaden the view.
+
+## Roles and responsibilities
+
+- **Product/ops**: Define the desired annex edits and ensure the right form/prompt context is passed. Monitor job status and results via the exposed tools.
+- **Data/IT**: Maintain SQL connectivity and K12 Safety API credentials; keep blocklists and safety thresholds aligned with policy.
+- **Prompt owners**: Manage the `k12-safety-agent` profile in the Agent Profiles service to change tone, guardrails, or model settings without redeploying code.

@@ -2,3 +2,36 @@
 title: 'Get Plants'
 openapi: 'GET /plants'
 ---
+
+Fetch all plants visible to the caller.
+
+### Request
+
+```bash
+curl -X GET "http://sandbox.mintlify.com/plants?limit=2" \
+	-H "Authorization: Bearer <token>"
+```
+
+### Successful response
+
+```json
+[
+	{
+		"name": "Monstera deliciosa",
+		"tag": "houseplant"
+	},
+	{
+		"name": "Aloe vera",
+		"tag": "succulent"
+	}
+]
+```
+
+### Error response
+
+```json
+{
+	"error": 400,
+	"message": "Invalid limit"
+}
+```

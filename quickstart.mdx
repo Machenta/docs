@@ -1,13 +1,19 @@
 ---
 title: "Quickstart"
 description: "Start building awesome documentation in minutes"
+audience: ["dev","pm"]
 ---
 
-## Get started in three steps
+<link rel="stylesheet" href="/styles.css" />
 
-Get your documentation site running locally and make your first customization.
+## Quickstart: Previewing & Local Development
 
-### Step 1: Set up your local environment
+This doc covers how to preview the documentation site.
+<audience data-audience="dev">It also shows how to run the Mastra runtime for local development.</audience>
+<audience data-audience="pm">Project managers: you typically don't need to run the runtime — reach out to the dev team if you need a local preview.</audience>
+The material below is a short version of the project README. For full details and advanced configuration, see the repository README at the project root.
+
+### Step 1: Set up your local environment (Docs & Runtime)
 
 <AccordionGroup>
   <Accordion icon="copy" title="Clone your docs locally">
@@ -15,13 +21,43 @@ Get your documentation site running locally and make your first customization.
     
     To clone the repository locally so that you can make and preview changes to your docs, follow the [Cloning a repository](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository) guide in the GitHub docs.
   </Accordion>
-  <Accordion icon="rectangle-terminal" title="Start the preview server">
-    1. Install the Mintlify CLI: `npm i -g mint`
-    2. Navigate to your docs directory and run: `mint dev`
-    3. Open `http://localhost:3000` to see your docs live!
-    
-    <Tip>Your preview updates automatically as you edit files.</Tip>
+
+  <Accordion icon="rectangle-terminal" title="View docs locally (optional)">
+    To preview the documentation locally, follow the repository README instructions. This project does not require a specific documentation CLI; use the workflow or tooling that works best for your environment. If you use Mintlify for doc previews in development, refer to Mintlify's docs — but installing and running the Mintlify CLI is optional and not required for Mastra development.
   </Accordion>
+
+  <audience data-audience="dev">
+    <Accordion icon="rectangle-terminal" title="Start the Mastra runtime (optional)">
+      1. From the project root (Mastra repo) install dependencies:
+      ```bash
+      npm install
+      ```
+      2. Copy environment example to a working `.env` and update values:
+      ```powershell
+      copy .env.example .env
+      ```
+      3. Verify `.env` keys are present:
+      ```bash
+      npm run check:env
+      ```
+      4. Start the runtime (recommended):
+      ```powershell
+      pwsh ./scripts/start-dev.ps1   # Windows PowerShell recommended
+      # OR
+      npm run quickstart
+      # OR (simple dev script)
+      npm run dev
+      ```
+
+      5. The Mastra runtime exposes runtime endpoints and the registries view at `http://localhost:4111` when running locally. Use `GET /registries` or the small UI at `/registries` to inspect loaded agents, tools, and workflows.
+    </Accordion>
+  </audience>
+
+  <audience data-audience="pm">
+  <Accordion icon="rectangle-terminal" title="Local preview & note for project managers">
+    Project managers: you don't need to run the Mastra runtime. You can preview the docs or view the hosted environment when available; contact your dev team if you need access to runtime endpoints or registries.
+  </Accordion>
+  </audience>
 </AccordionGroup>
 
 ### Step 2: Deploy your changes
@@ -57,16 +93,16 @@ Now that you have your docs running, explore these key features:
 
 <CardGroup cols={2}>
 
-<Card title="Write Content" icon="pen-to-square" href="/essentials/markdown">
-  Learn MDX syntax and start writing your documentation.
+<Card title="Write Content" icon="pen-to-square" href="/essentials/settings">
+  Learn the essentials of authoring, settings, and navigation.
 </Card>
 
 <Card title="Customize style" icon="palette" href="/essentials/settings">
   Make your docs match your brand perfectly.
 </Card>
 
-<Card title="Add code examples" icon="square-code" href="/essentials/code">
-  Include syntax-highlighted code blocks.
+<Card title="Add code examples" icon="square-code" href="/api-reference/introduction">
+  Include syntax-highlighted code blocks and API request examples.
 </Card>
 
 <Card title="API documentation" icon="code" href="/api-reference/introduction">
@@ -76,5 +112,13 @@ Now that you have your docs running, explore these key features:
 </CardGroup>
 
 <Note>
-  **Need help?** See our [full documentation](https://mintlify.com/docs) or join our [community](https://mintlify.com/community).
+  **Need help?** See the project README at the repo root for full developer instructions or open an issue if you need more context. Also, see Mintlify docs if you need help with the documentation platform.
+
+  **Audience-specific builds**: This repo supports filtering documentation for specific audiences (devs, project managers). To generate a PM- or Dev-specific build for sharing, run:
+
+  ```powershell
+  # From the docs folder
+  npm install && npm run build:docs:pm  # build docs for project managers
+  npm install && npm run build:docs:dev # build docs for developers
+  ```
 </Note>

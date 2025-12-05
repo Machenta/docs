@@ -1,11 +1,11 @@
 {
   "$schema": "https://mintlify.com/docs.json",
   "theme": "mint",
-  "name": "Mint Starter Kit",
+  "name": "K12 AI Tools",
   "colors": {
-    "primary": "#16A34A",
-    "light": "#07C983",
-    "dark": "#15803D"
+    "primary": "#0F61D4",
+    "light": "#E8F1FF",
+    "dark": "#0C4EAF"
   },
   "favicon": "/favicon.svg",
   "navigation": {
@@ -22,27 +22,16 @@
             ]
           },
           {
+            "group": "K12 Safety",
+            "pages": [
+              "k12/overview"
+            ]
+          },
+          {
             "group": "Customization",
             "pages": [
               "essentials/settings",
               "essentials/navigation"
-            ]
-          },
-          {
-            "group": "Writing content",
-            "pages": [
-              "essentials/markdown",
-              "essentials/code",
-              "essentials/images",
-              "essentials/reusable-snippets"
-            ]
-          },
-          {
-            "group": "AI tools",
-            "pages": [
-              "ai-tools/cursor",
-              "ai-tools/claude-code",
-              "ai-tools/windsurf"
             ]
           }
         ]
@@ -54,6 +43,12 @@
             "group": "API documentation",
             "pages": [
               "api-reference/introduction"
+            ]
+          },
+          {
+            "group": "K12 Safety",
+            "pages": [
+              "api-reference/k12/overview"
             ]
           },
           {
