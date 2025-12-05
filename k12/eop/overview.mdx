@@ -1,0 +1,37 @@
+---
+title: "Emergency Operations Plan (EOP)"
+description: "What EOPs are and how K12 Safety uses them"
+audience: ["dev","pm"]
+---
+
+<link rel="stylesheet" href="/styles.css" />
+
+## What is an EOP (Emergency Operations Plan)
+
+An Emergency Operations Plan (EOP) is the guiding document that outlines how a school or district prepares for, responds to, and recovers from emergencies. Within K12 Safety, an EOP contains annexes (sections) that may be edited or clarified through the annex editing workflow.
+
+<CardGroup cols={2}>
+<Card title="External reference" icon="rocket" href="/k12/external-reference">
+Client-facing endpoints, payloads, and sample requests for EOP annex editing.
+</Card>
+<Card title="Internal reference" icon="wrench" href="/k12/internal-reference">
+Schemas, workflow steps, and data stores that power the EOP tools.
+</Card>
+</CardGroup>
+
+## Why K12 Safety surfaces EOP snapshots
+
+- Ensure edits target a specific plan version when multiple plan revisions exist.
+- Provide context (plan metadata) to editors and the agent so changes are accurate.
+- Allow teams to fetch and review snapshots before applying edits.
+
+## Integrating with EOP flows
+
+- Provide `emergencyOperationPlanId` on kickoff to target a plan snapshot.
+- Use `k12-get-emergency-operation-plan-snapshot` to retrieve plan metadata and versions.
+- When calling the kickoff tool, pass the form field containing the content you want to edit along with optional `prompt` instructions.
+
+## Related pages
+- External API reference: `/k12/external-reference`
+- Internal developer details: `/k12/internal-reference`
+- Quick Reference Guides: `/k12/qrg/overview` (sits alongside EOPs for fast-read safety cards)

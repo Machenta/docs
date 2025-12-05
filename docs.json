@@ -1,0 +1,126 @@
+{
+  "$schema": "https://mintlify.com/docs.json",
+  "theme": "mint",
+  "name": "K12 Safety",
+  "colors": {
+    "primary": "#0F61D4",
+    "light": "#E8F1FF",
+    "dark": "#0C4EAF"
+  },
+  "favicon": "/favicon.svg",
+  "openapi": "api-reference/openapi.json",
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Guides",
+        "groups": [
+          {
+            "group": "Getting Started",
+            "pages": [
+              "index",
+              "k12/overview"
+            ]
+          },
+          {
+            "group": "Customization",
+            "pages": [
+              "customization/dashboard"
+            ]
+          },
+          {
+            "group": "Developer Resources",
+            "pages": [
+              "quickstart",
+              "development"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "EOP",
+        "groups": [
+          {
+            "group": "EOP",
+            "pages": [
+              "k12/eop/overview",
+              "k12/eop/technical",
+              "k12/external-reference",
+              "k12/eop/data-plane"
+            ]
+          },
+          {
+            "group": "EOP API Examples",
+            "pages": [
+              "api-reference/eop/overview",
+              "api-reference/eop/auth",
+              "api-reference/eop/kickoff",
+              "api-reference/eop/status",
+              "api-reference/eop/result",
+              "api-reference/eop/cancel"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "QRG",
+        "groups": [
+          {
+            "group": "QRG",
+            "pages": [
+              "k12/qrg/overview",
+              "k12/qrg/reference"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "API reference",
+        "groups": [
+          {
+            "group": "API Reference",
+            "pages": [
+              "api-reference/introduction"
+            ]
+          }
+        ]
+      }
+    ],
+    "global": {}
+  },
+  "logo": {
+    "light": "/logo/light.svg",
+    "dark": "/logo/dark.svg"
+  },
+  "navbar": {
+    "links": [
+      {
+        "label": "Support",
+        "href": "mailto:hi@mintlify.com"
+      }
+    ],
+    "primary": {
+      "type": "button",
+      "label": "Dashboard",
+      "href": "https://dashboard.mintlify.com"
+    }
+  },
+  "contextual": {
+    "options": [
+      "copy",
+      "view",
+      "chatgpt",
+      "claude",
+      "perplexity",
+      "mcp",
+      "cursor",
+      "vscode"
+    ]
+  },
+  "footer": {
+    "socials": {
+      "x": "https://x.com/mintlify",
+      "github": "https://github.com/mintlify",
+      "linkedin": "https://linkedin.com/company/mintlify"
+    }
+  }
+}

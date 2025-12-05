@@ -1,0 +1,64 @@
+---
+title: 'API Reference'
+description: 'Mastra API endpoints and specifications'
+---
+
+# Mastra API
+
+The Mastra API provides endpoints for managing agents, workflows, memory, tools, and more.
+
+## Base URLs
+
+| Environment | Base URL |
+| --- | --- |
+| Local Development | `http://localhost:4111` |
+| K12 Azure Dev (APIM) | `https://aitools-dev-apim-k12.azure-api.net` |
+
+## Quick Links
+
+<CardGroup cols={2}>
+  <Card title="EOP Examples" icon="file-code" href="/api-reference/eop/overview">
+    K12 Annex Editing Toolchain with authentication and workflow examples
+  </Card>
+  <Card title="Authentication" icon="key" href="/api-reference/eop/auth">
+    OAuth setup for K12 Azure Dev APIM
+  </Card>
+</CardGroup>
+
+---
+
+## Available Endpoints
+
+### System
+- `GET /health` - Health check endpoint
+- `GET /api` - Get API status
+
+### Agents
+- `GET /api/agents` - Get all available agents
+- `GET /api/agents/{agentId}` - Get agent by ID
+- `POST /api/agents/{agentId}/generate` - Generate a response from an agent
+- `POST /api/agents/{agentId}/stream` - Stream a response from an agent
+
+### Workflows
+- `GET /api/workflows` - Get all workflows
+- `GET /api/workflows/{workflowId}` - Get workflow by ID
+- `POST /api/workflows/{workflowId}/start` - Start a workflow
+
+### Memory
+- `GET /api/memory/threads` - Get all threads
+- `POST /api/memory/threads` - Create a new thread
+- `GET /api/memory/threads/{threadId}/messages` - Get messages for a thread
+
+### MCP (Model Context Protocol)
+- `GET /api/mcp/v0/servers` - List all MCP servers
+- `GET /api/mcp/{serverId}/tools` - List tools for an MCP server
+
+### Tools
+- `GET /api/tools` - Get all tools
+- `POST /api/tools/{toolId}/execute` - Execute a tool
+
+### K12 Annex Tools
+- `POST /api/tools/k12-annex-editing-kickoff/execute` - [Start an annex edit job](/api-reference/eop/kickoff)
+- `POST /api/tools/k12-annex-editing-status/execute` - [Poll job progress](/api-reference/eop/status)
+- `POST /api/tools/k12-annex-editing-result/execute` - [Retrieve edited content](/api-reference/eop/result)
+- `POST /api/tools/k12-cancel-task-request/execute` - [Cancel a running job](/api-reference/eop/cancel)
